@@ -5,6 +5,11 @@ import string
 from collections import Counter
 import re
 
+from botok import WordTokenizer
+
+# botok
+tok = WordTokenizer()
+
 # Paths
 data_dir = "data"
 input_dir = os.path.join(data_dir, "input")
@@ -12,16 +17,38 @@ source_out_file = os.path.join(data_dir, "source.txt")
 target_out_file = os.path.join(data_dir, "target.txt")
 out_file = os.path.join(data_dir, "aligned_words.txt")
 
-# 1. Inserting the regex tokenizers and clean-up functions
-def syllable_tokenizer(text):
-    text = re.sub(r'([ཀགཤ༔།])$', r'\1 ', text)
-    text = re.sub(r'།([^། ])', r'། \1', text)
-    text = re.sub(r'([ཀགཤ]) །', r'\1་ ། ', text)
-    text = text.replace('། །', '་ །། ')
-    text = text.replace('༔ ', '་ ༔ ')
-    text = re.sub(r'་+', '་', text)
-    text = text.replace('་', '་ ')
+
+def syllable_tokenizer(text, lemmatize=False):
+    tsek = '་'
+    tokens = tok.tokenize(text)
+    out = []
+    for t in tokens:
+        if t.chunk_type == 'TEXT':
+            if lemmatize:
+                tt = tok.tokenize(t.lemma)
+                syls = [[''.join(s) for s in t.syls] for t in tt]
+                for s in syls:
+                    out.extend(s)
+            else:
+                syls = t.syls
+                joined = [''.join(s) + tsek for s in syls]
+                out.extend(joined)
+        else:
+            out.append(t.text)
+    text = ' '.join(out)
     return text
+
+# 1. Inserting the regex tokenizers and clean-up functions
+#def syllable_tokenizer(text):
+#    text = re.sub(r'([ཀགཤ༔།])$', r'\1 ', text)
+#    text = re.sub(r'།([^། ])', r'། \1', text)
+#    text = re.sub(r'([ཀགཤ]) །', r'\1་ ། ', text)
+#    text = text.replace('། །', '་ །། ')
+#    text = text.replace('༔ ', '་ ༔ ')
+#    text = re.sub(r'་+', '་', text)
+#    text = text.replace('་', '་ ')
+#    return text
+
 
 def word_tokenizer(text):
     text = re.sub(r'([a-zA-Z])([!?,.":;])', r'\1 \2', text)
