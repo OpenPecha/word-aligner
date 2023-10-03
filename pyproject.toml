@@ -19,6 +19,11 @@ classifiers = [
 
 dependencies = [
     "botok >= 0.8.1",
+    "requests >= 2.31.0",
+    "github >= 1.2.7",
+    "PyGithub >= 2.1.1",
+    "retrying >= 1.3.4",
+    "typing_extensions >= 4.8.0",
 ]
 
 [project.optional-dependencies]
