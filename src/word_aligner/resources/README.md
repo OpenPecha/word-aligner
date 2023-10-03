@@ -13,3 +13,7 @@ https://github.com/OpenPecha-Data/C1A81F448/blob/main/C1A81F448.opc/meta.yml
 
 and the file is used to get all the list of TM files (this is done by getting the IDs from bo files). such that from file name BO0133, we get ID 0133 and we know there a corresponding TM
 file name TM0133.
+
+## all_TM_list.txt
+
+Contains all the TM file names extracted from all_BO_EN_list.txt.
