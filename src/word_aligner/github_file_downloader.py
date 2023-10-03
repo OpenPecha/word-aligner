@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 import requests
 from github import Github
@@ -46,11 +47,12 @@ class GitHubFileDownloader:
 
             else:
                 print(f"{self.repo_name}: Either bo or en file is not present.")
-                return None
+                return None, None
 
         except Exception as error:
-            print(f"An error occurred: {error}")
-            return None
+            print(f"{self.repo_name} An error occurred: {error}")
+            write_to_error_log(ERROR_LOG_FILE, self.repo_name)
+            return None, None
 
 
 @retry(
@@ -62,10 +64,6 @@ def download_file_with_url(
     download_url, new_downloaded_file_name, destination_folder="."
 ):
 
-    if download_url is None:
-        print("Failed to download file. Download URL is None")
-        write_to_error_log(ERROR_LOG_FILE, new_downloaded_file_name)
-        return
     response = requests.get(download_url)
 
     new_downloaded_file_name = new_downloaded_file_name
@@ -73,22 +71,37 @@ def download_file_with_url(
     if response.status_code == 200:
         with open(output_path, "wb") as local_file:
             local_file.write(response.content)
-        print(f"File downloaded and saved to {output_path}")
+        print(f"File {new_downloaded_file_name} downloaded and saved to {output_path}")
     else:
-        print(f"Failed to download file. Status code: {response.status_code}")
+        print(
+            f"File {new_downloaded_file_name} failed to download file. Status code: {response.status_code}"
+        )
         write_to_error_log(ERROR_LOG_FILE, new_downloaded_file_name)
 
 
 def write_to_error_log(error_log_file, filename):
     error_log_file_path = LOG_FOLDER_DIR / error_log_file
     with open(error_log_file_path, "a") as log_file:
-        log_file.write(f"{filename}: Failed to download: \n")
+        log_file.write(f"{filename}: Failed to download \n")
+
+
+def download_tm_files(tm_file_names: List[str], output_path=SUB_INPUT_1):
+    tm_files_count = len(tm_file_names)
+    tm_files_counter = 1
+    for tm_file_name in tm_file_names:
+        print(
+            f"[{tm_files_counter}/{tm_files_count}] Downloading files for {tm_file_name}"
+        )
+        tm_files_counter += 1
+        # Downloading bo, en files
+        downloader = GitHubFileDownloader(TOKEN, REPO_OWNER, tm_file_name)
+        bo_url, en_url = downloader.get_download_urls_from_repo()
+        if bo_url is not None and en_url is not None:
+            download_file_with_url(bo_url, f"{tm_file_name}-bo.txt", output_path)
+            download_file_with_url(en_url, f"{tm_file_name}-en.txt", output_path)
 
 
 if __name__ == "__main__":
     # Usage example
-    tm_file_name = "TM0791"
-    downloader = GitHubFileDownloader(TOKEN, REPO_OWNER, tm_file_name)
-    bo_url, en_url = downloader.get_download_urls_from_repo()
-    download_file_with_url(bo_url, f"{tm_file_name}-bo.txt", SUB_INPUT_1)
-    download_file_with_url(en_url, f"{tm_file_name}-en.txt", SUB_INPUT_1)
+    tm_file_names = ["TM0791", "TM079"]
+    download_tm_files(tm_file_names)
