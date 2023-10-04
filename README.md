@@ -15,26 +15,46 @@ The primary goal of this project is to create a robust and comprehensive bi-term
 
 <!-- Link to the repo owners' github profiles -->
 
-- [@ngawangtrinley] (https://github.com/ngawangtrinley)
-- [@drupchen] (https://github.com/drupchen)
-- [@tenzin3] (https://github.com/tenzin3)
+- [@ngawangtrinley](https://github.com/ngawangtrinley)
+- [@drupchen](https://github.com/drupchen)
+- [@tenzin3](https://github.com/tenzin3)
 
+
+## Installation
+
+mgiza++ installation steps:
+1.cd mgiza
+2.sudo apt-get install -y cmake libboost-all-dev
+3.git clone https://github.com/moses-smt/mgiza.git
+4.cd mgiza/mgizapp
+5.cmake . && make && make install
+6.Add the path to your system 'PATH'
+
+data folder
+
+/data
+    /input
+      /subdir1
+        TM...-bo.txt
+        TM...-en.txt
+      /subdir2
 
 ## Integrations
 
 <!-- Add any intregrations here or delete `- []()` and write None-->
 
 None
+
 ## Docs
 
 <!-- Update the link to the docs -->
 
 Read the docs [here](https://wiki.openpecha.org/#/dev/coding-guidelines).
 
-
 ## Note
 
 TODO:
+
 - test botok / dictionary
 - swap direction and find Buddhist English n-grams
 - improve file cleanup
