@@ -23,21 +23,13 @@ The primary goal of this project is to create a robust and comprehensive bi-term
 ## Installation
 
 mgiza++ installation steps:
-1.cd mgiza
-2.sudo apt-get install -y cmake libboost-all-dev
-3.git clone https://github.com/moses-smt/mgiza.git
-4.cd mgiza/mgizapp
-5.cmake . && make && make install
-6.Add the path to your system 'PATH'
 
-data folder
-
-/data
-    /input
-      /subdir1
-        TM...-bo.txt
-        TM...-en.txt
-      /subdir2
+- `cd mgiza`
+- `sudo apt-get install -y cmake libboost-all-dev`
+- `git clone https://github.com/moses-smt/mgiza.git`
+- `cd mgiza/mgizapp`: MonlamAI github org name
+- `cmake . && make && make install`
+- `add the path to your system PATH`
 
 ## Integrations
 
