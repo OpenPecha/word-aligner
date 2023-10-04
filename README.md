@@ -17,7 +17,7 @@ The primary goal of this project is to create a robust and comprehensive bi-term
 
 - [@ngawangtrinley] (https://github.com/ngawangtrinley)
 - [@drupchen] (https://github.com/drupchen)
-- [@tenzin3] (https://github.com/10zinten)
+- [@tenzin3] (https://github.com/tenzin3)
 
 
 ## Integrations
