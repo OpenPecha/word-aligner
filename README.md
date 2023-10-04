@@ -27,7 +27,7 @@ mgiza++ installation steps:
 - `cd mgiza`
 - `sudo apt-get install -y cmake libboost-all-dev`
 - `git clone https://github.com/moses-smt/mgiza.git`
-- `cd mgiza/mgizapp`: MonlamAI github org name
+- `cd mgiza/mgizapp`
 - `cmake . && make && make install`
 - `add the path to your system PATH`
 
