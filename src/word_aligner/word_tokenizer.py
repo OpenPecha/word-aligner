@@ -1,9 +1,20 @@
+import re
+
 from botok.tokenizers.wordtokenizer import WordTokenizer
 
 
 def botok_word_tokenizer(text: str, split_affixes=True) -> str:
+    # tibetan word tokenizer
     wt = WordTokenizer()
-    return wt.tokenize(text, split_affixes=split_affixes)
+    tokens = wt.tokenize(text, split_affixes=split_affixes)
+    tokens_text = " ".join([token.text for token in tokens])
+    return tokens_text
+
+
+def english_word_tokenizer(text) -> str:
+    text = re.sub(r'([a-zA-Z])([!?,.":;])', r"\1 \2", text)
+    text = re.sub(r'([!?,.":;])([a-zA-Z])', r"\1 \2", text)
+    return text
 
 
 if __name__ == "__main__":

@@ -14,6 +14,16 @@ def keep_only_english_characters(text: str) -> str:
     return re.sub(r"[^a-zA-Z0-9\s\n\t]+", r"", text)
 
 
+def clean_text(text: str, is_tibetan=False) -> str:
+    text = remove_number_emojis(text)
+    text = re.sub(r"[\{\(]", " < ", text)
+    text = re.sub(r"[\}\)]", " > ", text)
+    if not is_tibetan:
+        text = re.sub(r"[^\x00-\x7F]+", "", text).strip()  # Only for English
+    text = re.sub(r" +", " ", text).strip()
+    return text
+
+
 if __name__ == "__main__":
 
     # Example usage:

@@ -1,15 +1,12 @@
 import glob
 import os
-import re
 import string
 import subprocess
 from collections import Counter
 from typing import Dict
 
-from botok import WordTokenizer
-
-# botok
-tok = WordTokenizer()
+from .data_processor import clean_text
+from .word_tokenizer import botok_word_tokenizer, english_word_tokenizer
 
 # Paths
 data_dir = "data"
@@ -17,54 +14,6 @@ input_dir = os.path.join(data_dir, "input")
 source_out_file = os.path.join(data_dir, "source.txt")
 target_out_file = os.path.join(data_dir, "target.txt")
 out_file = os.path.join(data_dir, "aligned_words.txt")
-
-
-def syllable_tokenizer(text, lemmatize=False):
-    tsek = "་"
-    tokens = tok.tokenize(text)
-    out = []
-    for t in tokens:
-        if t.chunk_type == "TEXT":
-            if lemmatize:
-                tt = tok.tokenize(t.lemma)
-                syls = [["".join(s) for s in t.syls] for t in tt]
-                for s in syls:
-                    out.extend(s)
-            else:
-                syls = t.syls
-                joined = ["".join(s) + tsek for s in syls]
-                out.extend(joined)
-        else:
-            out.append(t.text)
-    text = " ".join(out)
-    return text
-
-
-# 1. Inserting the regex tokenizers and clean-up functions
-# def syllable_tokenizer(text):
-#    text = re.sub(r'([ཀགཤ༔།])$', r'\1 ', text)
-#    text = re.sub(r'།([^། ])', r'། \1', text)
-#    text = re.sub(r'([ཀགཤ]) །', r'\1་ ། ', text)
-#    text = text.replace('། །', '་ །། ')
-#    text = text.replace('༔ ', '་ ༔ ')
-#    text = re.sub(r'་+', '་', text)
-#    text = text.replace('་', '་ ')
-#    return text
-
-
-def word_tokenizer(text):
-    text = re.sub(r'([a-zA-Z])([!?,.":;])', r"\1 \2", text)
-    text = re.sub(r'([!?,.":;])([a-zA-Z])', r"\1 \2", text)
-    return text
-
-
-def clean_text(text, is_tibetan=False):
-    text = re.sub(r"[\{\(]", " < ", text)
-    text = re.sub(r"[\}\)]", " > ", text)
-    if not is_tibetan:
-        text = re.sub(r"[^\x00-\x7F]+", "", text).strip()  # Only for English
-    text = re.sub(r" +", " ", text).strip()
-    return text
 
 
 # Updated merging code with tokenization and ensuring non-empty pairs
@@ -94,8 +43,8 @@ with open(source_out_file, "w", encoding="utf-8") as source_out, open(
                     tgt_lines = tgt.readlines()
 
                     for src_line, tgt_line in zip(src_lines, tgt_lines):
-                        src_line = word_tokenizer(clean_text(src_line))
-                        tgt_line = syllable_tokenizer(
+                        src_line = english_word_tokenizer(clean_text(src_line))
+                        tgt_line = botok_word_tokenizer(
                             clean_text(tgt_line, is_tibetan=True)
                         )
 
