@@ -11,20 +11,10 @@ def count_files_in_folder(folder_path: Path) -> int:
     return len([item for item in folder_path.iterdir() if item.is_file()])
 
 
-def compare_number_of_bo_en_files_in_subdir(subdir_path: Path) -> bool:
-    bo_files = [
-        item
-        for item in subdir_path.iterdir()
-        if item.is_file() and item.name.endswith("-bo.txt")
-    ]
-    en_files = [
-        item
-        for item in subdir_path.iterdir()
-        if item.is_file() and item.name.endswith("-en.txt")
-    ]
-    print(f"Number of bo files: {len(bo_files)}")
-    print(f"Number of en files: {len(en_files)}")
-    return len(bo_files) == len(en_files)
+def get_bo_en_file_pairs(folder_path: Path):
+    en_files = list(folder_path.glob("*-en.txt"))
+    bo_files = list(folder_path.glob("*-bo.txt"))
+    return bo_files, en_files
 
 
 def filter_bo_repo_names_from_file(file_content: str) -> List[str]:
@@ -51,6 +41,4 @@ def extract_tm_names_using_regex(file_path: Path = BO_EN_FILE_PATH):
 
 
 if __name__ == "__main__":
-    # extract_tm_names_using_regex()
     print(count_files_in_folder(SUB_INPUT_1))
-    print(compare_number_of_bo_en_files_in_subdir(SUB_INPUT_1))
