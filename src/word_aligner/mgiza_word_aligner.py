@@ -5,7 +5,7 @@ import subprocess
 from collections import Counter
 from typing import Dict
 
-from .data_processor import clean_text
+from .data_processor import clean_english_text, clean_tibetan_text
 from .word_tokenizer import botok_word_tokenizer, english_word_tokenizer
 
 # Paths
@@ -43,10 +43,8 @@ with open(source_out_file, "w", encoding="utf-8") as source_out, open(
                     tgt_lines = tgt.readlines()
 
                     for src_line, tgt_line in zip(src_lines, tgt_lines):
-                        src_line = english_word_tokenizer(clean_text(src_line))
-                        tgt_line = botok_word_tokenizer(
-                            clean_text(tgt_line, is_tibetan=True)
-                        )
+                        src_line = english_word_tokenizer(clean_english_text(src_line))
+                        tgt_line = botok_word_tokenizer(clean_tibetan_text(tgt_line))
 
                         if src_line and tgt_line:
                             source_out.write(src_line + "\n")
