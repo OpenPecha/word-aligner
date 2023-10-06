@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import List
 
-from .config import RESOURCE_FOLDER_DIR, SUB_INPUT_1
+from .config import DATA_FOLDER_DIR, RESOURCE_FOLDER_DIR, SUB_INPUT_1
 
 BO_EN_FILE_PATH = Path(RESOURCE_FOLDER_DIR / "bo_en_list.txt")
 
@@ -15,6 +15,23 @@ def get_bo_en_file_pairs(folder_path: Path):
     en_files = list(folder_path.glob("*-en.txt"))
     bo_files = list(folder_path.glob("*-bo.txt"))
     return bo_files, en_files
+
+
+def merge_bo_en_files(folder_path: Path, output_folder_path: Path):
+    bo_files, en_files = get_bo_en_file_pairs(folder_path)
+    if len(bo_files) == len(en_files):
+        bo_merged_file = Path(output_folder_path / "bo_merged.txt")
+        en_merged_file = Path(output_folder_path / "en_merged.txt")
+
+        with open(bo_merged_file, "a", encoding="utf-8") as bo_output_file, open(
+            en_merged_file, "a", encoding="utf-8"
+        ) as en_output_file:
+            for bo_file, en_file in zip(sorted(bo_files), sorted(en_files)):
+                bo_file_lines = bo_file.read_text(encoding="utf-8").splitlines()
+                en_file_lines = en_file.read_text(encoding="utf-8").splitlines()
+                if len(bo_file_lines) == len(en_file_lines):
+                    bo_output_file.write("\n".join(bo_file_lines) + "\n")
+                    en_output_file.write("\n".join(en_file_lines) + "\n")
 
 
 def filter_bo_repo_names_from_file(file_content: str) -> List[str]:
@@ -41,4 +58,5 @@ def extract_tm_names_using_regex(file_path: Path = BO_EN_FILE_PATH):
 
 
 if __name__ == "__main__":
-    print(count_files_in_folder(SUB_INPUT_1))
+    # print(count_files_in_folder(SUB_INPUT_1))
+    merge_bo_en_files(SUB_INPUT_1, DATA_FOLDER_DIR)
