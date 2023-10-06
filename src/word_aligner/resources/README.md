@@ -17,3 +17,11 @@ file name TM0133.
 ## all_TM_list.txt
 
 Contains all the TM file names extracted from all_BO_EN_list.txt.
+
+
+## སྨོན་2020-headwords.csv
+
+Contains all the headwords from the dictionary སྨོན་2020. The file is used to get the list of headwords
+
+link: https://github.com/OpenPecha/dictionaries
+folder: bo-bo

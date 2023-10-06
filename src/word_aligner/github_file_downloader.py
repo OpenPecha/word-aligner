@@ -5,13 +5,13 @@ import requests
 from github import Github
 from retrying import retry
 
-from .config import LOG_FOLDER_DIR, SUB_INPUT_1
+from .config import LOG_FOLDER_DIR, RESOURCE_FOLDER_DIR, TMs_4006
 from .github_token import GITHUB_TOKEN
 
 TOKEN = GITHUB_TOKEN
 REPO_OWNER = "MonlamAI"
 
-ERROR_LOG_FILE = "Failed_to_download_BOs.txt"
+ERROR_LOG_FILE = "Failed_to_download_TMs.txt"
 
 
 class GitHubFileDownloader:
@@ -85,7 +85,7 @@ def write_to_error_log(error_log_file, filename):
         log_file.write(f"{filename}: Failed to download \n")
 
 
-def download_tm_files(tm_file_names: List[str], output_path=SUB_INPUT_1):
+def download_tm_files(tm_file_names: List[str], output_path=TMs_4006):
     tm_files_count = len(tm_file_names)
     tm_files_counter = 1
     for tm_file_name in tm_file_names:
@@ -103,5 +103,10 @@ def download_tm_files(tm_file_names: List[str], output_path=SUB_INPUT_1):
 
 if __name__ == "__main__":
     # Usage example
-    tm_file_names = ["TM0791", "TM079"]
+    tm_names_content = Path(RESOURCE_FOLDER_DIR / "tm_list.txt").read_text(
+        encoding="utf-8"
+    )
+    tm_file_names = tm_names_content.split("\n")
+    # Removing empty strings
+    tm_file_names = [tm_file_name for tm_file_name in tm_file_names if tm_file_name]
     download_tm_files(tm_file_names)
