@@ -21,6 +21,8 @@ with open(source_out_file, "w", encoding="utf-8") as source_out, open(
     target_out_file, "w", encoding="utf-8"
 ) as target_out:
     for subdir in os.listdir(input_dir):
+        if subdir == "TMs_4006":
+            continue
         full_subdir_path = os.path.join(input_dir, subdir)
         if os.path.isdir(full_subdir_path):
             files_in_subdir = os.listdir(full_subdir_path)

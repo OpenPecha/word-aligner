@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import List
 
-from .config import RESOURCE_FOLDER_DIR
+from .config import RESOURCE_FOLDER_DIR, TMs_30, TMs_4006
 
 BO_EN_FILE_PATH = Path(RESOURCE_FOLDER_DIR / "bo_en_list.txt")
 
@@ -58,5 +58,28 @@ def extract_tm_names_using_regex(file_path: Path = BO_EN_FILE_PATH):
     tm_list_file_path.write_text("\n".join(tm_names), encoding="utf-8")
 
 
+def count_lines(file_path: Path):
+    return len(file_path.read_text(encoding="utf-8").splitlines())
+
+
+def copy_bo_en_file_pairs(source_folder: Path, destination_folder: Path, count: int):
+    bo_files, en_files = get_bo_en_file_pairs(source_folder)
+    counter = 0
+    for bo_file, en_file in zip(sorted(bo_files), sorted(en_files)):
+        if counter >= count:
+            break
+        if count_lines(bo_file) != count_lines(en_file):
+            continue
+        bo_file_destination = destination_folder / bo_file.name
+        en_file_destination = destination_folder / en_file.name
+        bo_file_destination.write_text(
+            bo_file.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        en_file_destination.write_text(
+            en_file.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        counter += 2
+
+
 if __name__ == "__main__":
-    pass
+    copy_bo_en_file_pairs(TMs_4006, TMs_30, 30)
