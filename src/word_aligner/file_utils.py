@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import List
 
-from .config import DATA_FOLDER_DIR, RESOURCE_FOLDER_DIR, SUB_INPUT_1
+from .config import RESOURCE_FOLDER_DIR
 
 BO_EN_FILE_PATH = Path(RESOURCE_FOLDER_DIR / "bo_en_list.txt")
 
@@ -18,6 +18,7 @@ def get_bo_en_file_pairs(folder_path: Path):
 
 
 def merge_bo_en_files(folder_path: Path, output_folder_path: Path):
+    # merge all bo files into one, and all en files into one
     bo_files, en_files = get_bo_en_file_pairs(folder_path)
     if len(bo_files) == len(en_files):
         bo_merged_file = Path(output_folder_path / "bo_merged.txt")
@@ -58,5 +59,4 @@ def extract_tm_names_using_regex(file_path: Path = BO_EN_FILE_PATH):
 
 
 if __name__ == "__main__":
-    # print(count_files_in_folder(SUB_INPUT_1))
-    merge_bo_en_files(SUB_INPUT_1, DATA_FOLDER_DIR)
+    pass

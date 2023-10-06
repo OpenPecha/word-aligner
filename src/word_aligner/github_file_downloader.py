@@ -5,7 +5,7 @@ import requests
 from github import Github
 from retrying import retry
 
-from .config import LOG_FOLDER_DIR, RESOURCE_FOLDER_DIR, SUB_INPUT_1
+from .config import LOG_FOLDER_DIR, RESOURCE_FOLDER_DIR, TMs_4006
 from .github_token import GITHUB_TOKEN
 
 TOKEN = GITHUB_TOKEN
@@ -85,7 +85,7 @@ def write_to_error_log(error_log_file, filename):
         log_file.write(f"{filename}: Failed to download \n")
 
 
-def download_tm_files(tm_file_names: List[str], output_path=SUB_INPUT_1):
+def download_tm_files(tm_file_names: List[str], output_path=TMs_4006):
     tm_files_count = len(tm_file_names)
     tm_files_counter = 1
     for tm_file_name in tm_file_names:

@@ -1,6 +1,9 @@
 import re
+from pathlib import Path
 
 from botok.tokenizers.wordtokenizer import WordTokenizer
+
+from .config import DATA_FOLDER_DIR
 
 
 def botok_word_tokenizer(text: str, split_affixes=True) -> str:
@@ -19,5 +22,6 @@ def english_word_tokenizer(text) -> str:
 
 if __name__ == "__main__":
     test_sen = "དེའི་བདག་ཉིད་སྡུག་བསྔལ་བའི་འགྲོ་བ་ལ་སྙིང་རྗེ་བ་གང་ཡིན་པའི་སྙིང་རྗེ་དེའི་ཕྱིར་རོ།།"
-    tokenized = botok_word_tokenizer(test_sen, False)
+    test_sen = Path(DATA_FOLDER_DIR / "test_bo_merged.txt").read_text(encoding="utf-8")
+    tokenized = botok_word_tokenizer(test_sen, True)
     print(tokenized)
