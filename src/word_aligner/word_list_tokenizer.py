@@ -10,7 +10,7 @@ MONLAM_2020 = (
 )
 
 
-def tokenize_using_word_list(text, word_list: List["str"] = MONLAM_2020) -> str:
+def tokenize_tibetan_word_list(text, word_list: List["str"] = MONLAM_2020) -> str:
     tokens = []  # Initialize an empty list to store tokens
 
     while text:
@@ -51,5 +51,5 @@ def tokenize_using_word_list(text, word_list: List["str"] = MONLAM_2020) -> str:
 if __name__ == "__main__":
     # Example usage:
     text = "དེའི་བདག་ཉིད་སྡུག་བསྔལ་བའི་འགྲོ་བ་ལ་སྙིང་རྗེ་བ་གང་ཡིན་པའི་སྙིང་རྗེ་དེའི་ཕྱིར་རོ།།"
-    tokens = tokenize_using_word_list(text)
+    tokens = tokenize_tibetan_word_list(text)
     print(tokens)

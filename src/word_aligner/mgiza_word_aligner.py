@@ -7,10 +7,10 @@ from typing import Dict
 
 from .data_processor import clean_english_text, clean_tibetan_text
 from .word_tokenizer import (
-    botok_word_tokenizer,
     load_botok_word_tokenizer,
     load_spacy_word_tokenizer,
-    spacy_word_tokenizer,
+    tokenize_english_with_spacy,
+    tokenize_tibetan_with_botok,
 )
 
 # Paths
@@ -53,10 +53,10 @@ with open(source_out_file, "w", encoding="utf-8") as source_out, open(
                     tgt_lines = tgt.readlines()
 
                     for src_line, tgt_line in zip(src_lines, tgt_lines):
-                        src_line = spacy_word_tokenizer(
+                        src_line = tokenize_english_with_spacy(
                             spacy_tokenizer_obj, clean_english_text(src_line)
                         )
-                        tgt_line = botok_word_tokenizer(
+                        tgt_line = tokenize_tibetan_with_botok(
                             botok_tokenizer_obj, clean_tibetan_text(tgt_line)
                         )
 
