@@ -1,13 +1,20 @@
 import re
+import warnings
 
 from botok.tokenizers.wordtokenizer import WordTokenizer
 
 
+def load_botok_word_tokenizer():
+    return WordTokenizer()
+
+
 def botok_word_tokenizer(wt: WordTokenizer, text: str, split_affixes=True) -> str:
     # tibetan word tokenizer
-    tokens = wt.tokenize(text, split_affixes=split_affixes)
-    tokens_text = " ".join([token.text for token in tokens])
-    return tokens_text
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore")
+        tokens = wt.tokenize(text, split_affixes=split_affixes)
+        tokens_text = " ".join([token.text for token in tokens])
+        return tokens_text
 
 
 def english_word_tokenizer(text) -> str:

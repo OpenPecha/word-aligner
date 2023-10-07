@@ -5,10 +5,12 @@ import subprocess
 from collections import Counter
 from typing import Dict
 
-from botok.tokenizers.wordtokenizer import WordTokenizer
-
 from .data_processor import clean_english_text, clean_tibetan_text
-from .word_tokenizer import botok_word_tokenizer, english_word_tokenizer
+from .word_tokenizer import (
+    botok_word_tokenizer,
+    english_word_tokenizer,
+    load_botok_word_tokenizer,
+)
 
 # Paths
 data_dir = "data"
@@ -18,7 +20,7 @@ target_out_file = os.path.join(data_dir, "target.txt")
 out_file = os.path.join(data_dir, "aligned_words.txt")
 
 
-word_tokenizer_obj = WordTokenizer()
+botok_tokenizer_obj = load_botok_word_tokenizer()
 
 # Updated merging code with tokenization and ensuring non-empty pairs
 with open(source_out_file, "w", encoding="utf-8") as source_out, open(
@@ -51,7 +53,7 @@ with open(source_out_file, "w", encoding="utf-8") as source_out, open(
                     for src_line, tgt_line in zip(src_lines, tgt_lines):
                         src_line = english_word_tokenizer(clean_english_text(src_line))
                         tgt_line = botok_word_tokenizer(
-                            word_tokenizer_obj, clean_tibetan_text(tgt_line)
+                            botok_tokenizer_obj, clean_tibetan_text(tgt_line)
                         )
 
                         if src_line and tgt_line:
