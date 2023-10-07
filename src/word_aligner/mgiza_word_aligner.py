@@ -8,8 +8,9 @@ from typing import Dict
 from .data_processor import clean_english_text, clean_tibetan_text
 from .word_tokenizer import (
     botok_word_tokenizer,
-    english_word_tokenizer,
     load_botok_word_tokenizer,
+    load_spacy_word_tokenizer,
+    spacy_word_tokenizer,
 )
 
 # Paths
@@ -21,6 +22,7 @@ out_file = os.path.join(data_dir, "aligned_words.txt")
 
 
 botok_tokenizer_obj = load_botok_word_tokenizer()
+spacy_tokenizer_obj = load_spacy_word_tokenizer()
 
 # Updated merging code with tokenization and ensuring non-empty pairs
 with open(source_out_file, "w", encoding="utf-8") as source_out, open(
@@ -51,7 +53,9 @@ with open(source_out_file, "w", encoding="utf-8") as source_out, open(
                     tgt_lines = tgt.readlines()
 
                     for src_line, tgt_line in zip(src_lines, tgt_lines):
-                        src_line = english_word_tokenizer(clean_english_text(src_line))
+                        src_line = spacy_word_tokenizer(
+                            spacy_tokenizer_obj, clean_english_text(src_line)
+                        )
                         tgt_line = botok_word_tokenizer(
                             botok_tokenizer_obj, clean_tibetan_text(tgt_line)
                         )

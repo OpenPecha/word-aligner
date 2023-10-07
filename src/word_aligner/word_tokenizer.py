@@ -1,11 +1,22 @@
-import re
 import warnings
 
+import spacy
 from botok.tokenizers.wordtokenizer import WordTokenizer
 
 
 def load_botok_word_tokenizer():
     return WordTokenizer()
+
+
+def load_spacy_word_tokenizer():
+    return spacy.load("en_core_web_sm")
+
+
+def spacy_word_tokenizer(spacy_nlp: spacy, text: str) -> str:
+    # english word tokenizer
+    doc = spacy_nlp(text)
+    tokens_text = " ".join([token.text for token in doc])
+    return tokens_text
 
 
 def botok_word_tokenizer(wt: WordTokenizer, text: str, split_affixes=True) -> str:
@@ -15,12 +26,6 @@ def botok_word_tokenizer(wt: WordTokenizer, text: str, split_affixes=True) -> st
         tokens = wt.tokenize(text, split_affixes=split_affixes)
         tokens_text = " ".join([token.text for token in tokens])
         return tokens_text
-
-
-def english_word_tokenizer(text) -> str:
-    text = re.sub(r'([a-zA-Z])([!?,.":;])', r"\1 \2", text)
-    text = re.sub(r'([!?,.":;])([a-zA-Z])', r"\1 \2", text)
-    return text
 
 
 if __name__ == "__main__":
