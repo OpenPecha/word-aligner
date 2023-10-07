@@ -22,19 +22,19 @@ def normalise_punctuation(text: str) -> str:
 
 def clean_tibetan_text(text: str) -> str:
     text = clean_text(text)
+    text = re.sub(r"[ ]+", "", text).strip()
     return text
 
 
 def clean_english_text(text: str) -> str:
     text = clean_text(text)
-    text = re.sub(r"[^\x00-\x7F]+", "", text).strip()
+    text = re.sub(r"[ ]+", " ", text).strip()
     return text
 
 
 def clean_text(text: str, is_tibetan=False) -> str:
     text = remove_number_emojis(text)
     text = normalise_punctuation(text)
-    text = re.sub(r" +", " ", text).strip()
     return text
 
 
@@ -42,5 +42,5 @@ if __name__ == "__main__":
 
     # Example usage:
     input_text = "This is a བཀྲ་ཤིས་sample བདེ་ལེགས་ text."
-    filtered_text = keep_only_english_characters(input_text)
+    filtered_text = clean_tibetan_text(input_text)
     print(filtered_text)
