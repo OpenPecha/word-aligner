@@ -9,12 +9,15 @@ from word_aligner.data_processor import clean_english_text, clean_tibetan_text
 from word_aligner.word_tokenizer import (
     load_botok_word_tokenizer,
     load_spacy_word_tokenizer,
+    tokenize_english_with_named_entities,
     tokenize_english_with_spacy,
     tokenize_tibetan_with_botok,
 )
 
 
-def tokenize_and_merge_files():
+def tokenize_and_merge_files(
+    split_affix=True, tibetan_lemma=False, english_lemma=False, named_entities=False
+):
     # Paths
     data_dir = "data"
     input_dir = os.path.join(data_dir, "input")
@@ -55,11 +58,23 @@ def tokenize_and_merge_files():
                         tgt_lines = tgt.readlines()
 
                         for src_line, tgt_line in zip(src_lines, tgt_lines):
-                            src_line = tokenize_english_with_spacy(
-                                spacy_tokenizer_obj, clean_english_text(src_line)
-                            )
+                            if named_entities:
+                                src_line = tokenize_english_with_named_entities(
+                                    spacy_tokenizer_obj,
+                                    clean_english_text(src_line),
+                                    english_lemma,
+                                )
+                            else:
+                                src_line = tokenize_english_with_spacy(
+                                    spacy_tokenizer_obj,
+                                    clean_english_text(src_line),
+                                    english_lemma,
+                                )
                             tgt_line = tokenize_tibetan_with_botok(
-                                botok_tokenizer_obj, clean_tibetan_text(tgt_line)
+                                botok_tokenizer_obj,
+                                clean_tibetan_text(tgt_line),
+                                split_affix,
+                                tibetan_lemma,
                             )
 
                             if src_line and tgt_line:
