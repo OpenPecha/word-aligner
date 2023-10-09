@@ -32,7 +32,10 @@ def tokenize_english_with_named_entities(
     while idx < len(doc):
         token = doc[idx]
         if token.ent_type_ == "":
-            tokens_text += f"{token.lemma} "
+            if lemma:
+                tokens_text += f"{token.lemma_} "
+            else:
+                tokens_text += f"{token.text} "
             idx += 1
         else:
             curr_entity = token.ent_type_
@@ -63,4 +66,4 @@ def tokenize_tibetan_with_botok(
 if __name__ == "__main__":
     spacy_nlp = load_spacy_word_tokenizer()
     test_sentence = "Barack Obama has $3000 dollars."
-    print(tokenize_english_with_named_entities(spacy_nlp, test_sentence))
+    print(tokenize_english_with_spacy(spacy_nlp, test_sentence, True))
