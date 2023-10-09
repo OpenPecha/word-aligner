@@ -2,7 +2,11 @@ from word_aligner.mgiza_word_aligner import execute_mgiza, tokenize_and_merge_fi
 
 
 def pipeline(
-    split_affix=True, tibetan_lemma=False, english_lemma=False, named_entities=False
+    split_affix=True,
+    tibetan_lemma=False,
+    combine_tibetan_compound_words=False,
+    english_lemma=False,
+    combine_english_compound_words=False,
 ):
     """
     Tibetan tokenizer options
@@ -12,12 +16,20 @@ def pipeline(
     """
 
     tokenize_and_merge_files(
-        split_affix=True, tibetan_lemma=False, english_lemma=False, named_entities=False
+        split_affix=True,
+        tibetan_lemma=False,
+        combine_tibetan_compound_words=False,
+        english_lemma=False,
+        combine_english_compound_words=False,
     )
     execute_mgiza()
 
 
 if __name__ == "__main__":
     pipeline(
-        split_affix=True, tibetan_lemma=False, english_lemma=False, named_entities=False
+        split_affix=True,
+        tibetan_lemma=False,
+        combine_tibetan_compound_words=False,
+        english_lemma=False,
+        combine_english_compound_words=False,
     )

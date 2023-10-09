@@ -16,7 +16,11 @@ from word_aligner.word_tokenizer import (
 
 
 def tokenize_and_merge_files(
-    split_affix=True, tibetan_lemma=False, english_lemma=False, named_entities=False
+    split_affix=True,
+    tibetan_lemma=False,
+    combine_tibetan_compound_words=False,  # noqa
+    english_lemma=False,
+    combine_english_compound_words=False,
 ):
     # Paths
     data_dir = "data"
@@ -58,7 +62,7 @@ def tokenize_and_merge_files(
                         tgt_lines = tgt.readlines()
 
                         for src_line, tgt_line in zip(src_lines, tgt_lines):
-                            if named_entities:
+                            if combine_english_compound_words:
                                 src_line = tokenize_english_with_named_entities(
                                     spacy_tokenizer_obj,
                                     clean_english_text(src_line),
