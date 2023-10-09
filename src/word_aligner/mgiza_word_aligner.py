@@ -5,8 +5,8 @@ import subprocess
 from collections import Counter
 from typing import Dict
 
-from .data_processor import clean_english_text, clean_tibetan_text
-from .word_tokenizer import (
+from word_aligner.data_processor import clean_english_text, clean_tibetan_text
+from word_aligner.word_tokenizer import (
     load_botok_word_tokenizer,
     load_spacy_word_tokenizer,
     tokenize_english_with_spacy,

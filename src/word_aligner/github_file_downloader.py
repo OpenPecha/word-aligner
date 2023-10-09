@@ -5,8 +5,8 @@ import requests
 from github import Github
 from retrying import retry
 
-from .config import LOG_FOLDER_DIR, RESOURCE_FOLDER_DIR, TMs_4006
-from .github_token import GITHUB_TOKEN
+from word_aligner.config import LOG_FOLDER_DIR, RESOURCE_FOLDER_DIR, TMs_4006
+from word_aligner.github_token import GITHUB_TOKEN
 
 TOKEN = GITHUB_TOKEN
 REPO_OWNER = "MonlamAI"

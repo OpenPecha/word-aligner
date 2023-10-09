@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List
 
-from .config import PUNCTS, RESOURCE_FOLDER_DIR
+from word_aligner.config import PUNCTS, RESOURCE_FOLDER_DIR
 
 MONLAM_2020 = (
     Path(RESOURCE_FOLDER_DIR / "སྨོན་2020-headwords.csv")
