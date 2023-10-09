@@ -1,27 +1,56 @@
-import re
-from pathlib import Path
+import warnings
 
+import spacy
 from botok.tokenizers.wordtokenizer import WordTokenizer
 
-from .config import DATA_FOLDER_DIR
+
+def load_botok_word_tokenizer():
+    return WordTokenizer()
 
 
-def botok_word_tokenizer(text: str, split_affixes=True) -> str:
-    # tibetan word tokenizer
-    wt = WordTokenizer()
-    tokens = wt.tokenize(text, split_affixes=split_affixes)
-    tokens_text = " ".join([token.text for token in tokens])
+def load_spacy_word_tokenizer():
+    return spacy.load("en_core_web_sm")
+
+
+def tokenize_english_with_spacy(spacy_nlp: spacy, text: str) -> str:
+    # english word tokenizer
+    doc = spacy_nlp(text)
+    tokens_text = " ".join([token.text for token in doc])
     return tokens_text
 
 
-def english_word_tokenizer(text) -> str:
-    text = re.sub(r'([a-zA-Z])([!?,.":;])', r"\1 \2", text)
-    text = re.sub(r'([!?,.":;])([a-zA-Z])', r"\1 \2", text)
-    return text
+def tokenize_english_with_named_entities(spacy_nlp: spacy, text: str) -> str:
+    # english word tokenizer
+    doc = spacy_nlp(text)
+    tokens_text = ""
+    idx = 0
+    while idx < len(doc):
+        token = doc[idx]
+        if token.ent_type_ == "":
+            tokens_text += f"{token.text} "
+            idx += 1
+        else:
+            curr_entity = token.ent_type_
+            index = idx
+            while index < len(doc) and doc[index].ent_type_ == curr_entity:
+                index += 1
+            curr_entity_word = [f"{doc[i].text}" for i in range(idx, index)]
+            tokens_text += "+".join(curr_entity_word)
+            idx = index
+            tokens_text += " "
+    return tokens_text
+
+
+def tokenize_tibetan_with_botok(wt: WordTokenizer, text: str) -> str:
+    # tibetan word tokenizer
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore")
+        tokens = wt.tokenize(text, split_affixes=True)
+        tokens_text = " ".join([token.text for token in tokens])
+        return tokens_text
 
 
 if __name__ == "__main__":
-    test_sen = "དེའི་བདག་ཉིད་སྡུག་བསྔལ་བའི་འགྲོ་བ་ལ་སྙིང་རྗེ་བ་གང་ཡིན་པའི་སྙིང་རྗེ་དེའི་ཕྱིར་རོ།།"
-    test_sen = Path(DATA_FOLDER_DIR / "test_bo_merged.txt").read_text(encoding="utf-8")
-    tokenized = botok_word_tokenizer(test_sen, True)
-    print(tokenized)
+    spacy_nlp = load_spacy_word_tokenizer()
+    test_sentence = "Barack Obama has $3000 dollars."
+    print(tokenize_english_with_named_entities(spacy_nlp, test_sentence))
