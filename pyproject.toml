@@ -28,14 +28,6 @@ dependencies = [
 ]
 
 
-[tool.poetry.dependencies]
-python = "^3.7"
-requests = "^2.31.0"
-spacy = "^3.7.1"
-
-[tool.poetry.scripts]
-post-install = "python download_model.py"
-
 
 
 [project.optional-dependencies]

@@ -16,20 +16,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
         python-version: "3.8"
-        
+
     - name: Install dependencies
       run: |
         pip install -U pip
         pip install .
         pip install .[dev]
-        
+
+    - name: Download spaCy model en_core_web_sm
+      run: |
+        python -m spacy download en_core_web_sm
+
     - name: Test with pytest
       run: PYTHONPATH=src pytest
-    
+
     - name: Test Coverage
       run: PYTHONPATH=src pytest --cov project_name
