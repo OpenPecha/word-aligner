@@ -20,8 +20,13 @@ def group_words_by_first_character(word_list: List[str]) -> dict:
     for word in word_list:
         first_char = word[0]
         if first_char not in word_dict:
-            word_dict[first_char] = set()
-        word_dict[first_char].add(word)
+            word_dict[first_char] = []
+        word_dict[first_char].append(word)
+
+    # Sort the words within each group by length in descending order
+    for _, words in word_dict.items():
+        words.sort(key=lambda x: len(x), reverse=True)
+
     return word_dict
 
 
