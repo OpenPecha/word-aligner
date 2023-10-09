@@ -1,55 +1,72 @@
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from word_aligner.config import PUNCTS, RESOURCE_FOLDER_DIR
 
-MONLAM_2020 = (
-    Path(RESOURCE_FOLDER_DIR / "སྨོན་2020-headwords.csv")
-    .read_text(encoding="utf-8")
-    .splitlines()
-)
+
+def load_MONLAM_2020_word_list():
+    MONLAM_2020 = (
+        Path(RESOURCE_FOLDER_DIR / "སྨོན་2020-headwords.csv")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    )
+    MONLAM_2020_word_dict = group_words_by_first_character(MONLAM_2020)
+    return MONLAM_2020_word_dict
 
 
-def tokenize_tibetan_word_list(text, word_list: List["str"] = MONLAM_2020) -> str:
-    tokens = []  # Initialize an empty list to store tokens
+def group_words_by_first_character(word_list: List[str]) -> dict:
+    # Create a dictionary with the first character of each word as the key
+    word_dict: Dict = {}
+    for word in word_list:
+        first_char = word[0]
+        if first_char not in word_dict:
+            word_dict[first_char] = set()
+        word_dict[first_char].add(word)
+    return word_dict
 
-    while text:
+
+def tokenize_tibetan_word_list(text, word_dict: dict) -> str:
+    tokens = []
+    index = 0
+
+    while index < len(text):
         match_found = False
-        # Check if the text ends with a punctuation mark
+        first_char = text[index]
+
+        # Check if the first character of the text matches any key in the word_dict
+        if first_char in word_dict:
+            for word in word_dict[first_char]:
+                if text.startswith(word, index):
+                    tokens.append(word)
+                    index += len(word)
+                    match_found = True
+                    break
+
+        if match_found:
+            continue
+
+        # Check if the text starting at the current index matches any punctuation
         for punct in PUNCTS:
-            if text.endswith(punct):
+            if text.startswith(punct, index):
                 tokens.append(punct)
-                text = text[: -len(punct)]
+                index += len(punct)
                 match_found = True
                 break
-        if match_found:
-            continue
 
-        # Start with the longest possible word and try to find a match
-        for word in reversed(word_list):
-            if text.endswith(word):
-                tokens.append(word)  # Add the matched word to the tokens list
-                text = text[: -len(word)]  # Remove the matched word from the text
-                match_found = True
-                break  # Exit the loop and start over with the remaining text
-        if match_found:
-            continue
-        # If no match is found,  a syllable is taken as a token
-        if text:
-            tsek_last_occur = text.rfind("་")
-            if tsek_last_occur == len(text) - 1:
-                tsek_last_occur = text[:tsek_last_occur].rfind("་")
+        if not match_found:
+            tsek_next_occur = text.find("་", index)
+            if tsek_next_occur == -1:
+                tsek_next_occur = len(text)
 
-            tokens.append(text[tsek_last_occur + 1 :])  # noqa
-            text = text[: tsek_last_occur + 1]
+            tokens.append(text[index : tsek_next_occur + 1])  # noqa
+            index = tsek_next_occur + 1
 
-    # Reverse the list to maintain the original order of tokens
-    tokens.reverse()
     return " ".join(tokens)
 
 
 if __name__ == "__main__":
     # Example usage:
     text = "དེའི་བདག་ཉིད་སྡུག་བསྔལ་བའི་འགྲོ་བ་ལ་སྙིང་རྗེ་བ་གང་ཡིན་པའི་སྙིང་རྗེ་དེའི་ཕྱིར་རོ།།"
-    tokens = tokenize_tibetan_word_list(text)
+    MONLAM_2020 = load_MONLAM_2020_word_list()
+    tokens = tokenize_tibetan_word_list(text, MONLAM_2020)
     print(tokens)
