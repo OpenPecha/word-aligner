@@ -25,6 +25,7 @@ def tokenize_and_merge_files(
     combine_tibetan_compound_words=False,
     english_lemma=False,
     combine_english_compound_words=False,
+    num_files_to_train=1,
 ):
     # Paths
     data_dir = "data"
@@ -41,13 +42,15 @@ def tokenize_and_merge_files(
         target_out_file, "w", encoding="utf-8"
     ) as target_out:
         for subdir in os.listdir(input_dir):
-            if subdir == "TMs_4006" or subdir == "TMs_30":
-                continue
+
             full_subdir_path = os.path.join(input_dir, subdir)
             if os.path.isdir(full_subdir_path):
                 files_in_subdir = os.listdir(full_subdir_path)
                 source_files = [f for f in files_in_subdir if f.endswith("-en.txt")]
                 target_files = [f for f in files_in_subdir if f.endswith("-bo.txt")]
+
+                source_files = sorted(source_files)[:num_files_to_train]
+                target_files = sorted(target_files)[:num_files_to_train]
 
                 if len(source_files) != len(target_files):
                     print(
