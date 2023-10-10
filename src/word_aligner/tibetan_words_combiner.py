@@ -4,7 +4,7 @@ from typing import Dict, List
 from word_aligner.config import RESOURCE_FOLDER_DIR
 
 
-def load_MONLAM_2020_word_list():
+def load_MONLAM_2020_word_dict():
     MONLAM_2020 = (
         Path(RESOURCE_FOLDER_DIR / "སྨོན་2020-headwords.csv")
         .read_text(encoding="utf-8")
@@ -30,7 +30,7 @@ def group_words_by_first_character(word_list: List[str]) -> dict:
     return word_dict
 
 
-def combine_compound_words_MONLAM2020(sentence, word_dict):
+def combine_compound_words_MONLAM2020(word_dict, sentence):
     words = sentence.split()
     i = 0
     while i < len(words):
@@ -50,5 +50,5 @@ def combine_compound_words_MONLAM2020(sentence, word_dict):
 if __name__ == "__main__":
     # Example usage:
     text = "ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་པ ས་"
-    MONLAM_2020 = load_MONLAM_2020_word_list()
+    MONLAM_2020 = load_MONLAM_2020_word_dict()
     print(combine_compound_words_MONLAM2020(text, MONLAM_2020))

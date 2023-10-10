@@ -6,6 +6,10 @@ from collections import Counter
 from typing import Dict
 
 from word_aligner.data_processor import clean_english_text, clean_tibetan_text
+from word_aligner.tibetan_words_combiner import (
+    combine_compound_words_MONLAM2020,
+    load_MONLAM_2020_word_dict,
+)
 from word_aligner.word_tokenizer import (
     load_botok_word_tokenizer,
     load_spacy_word_tokenizer,
@@ -18,7 +22,7 @@ from word_aligner.word_tokenizer import (
 def tokenize_and_merge_files(
     split_affix=True,
     tibetan_lemma=False,
-    combine_tibetan_compound_words=False,  # noqa
+    combine_tibetan_compound_words=False,
     english_lemma=False,
     combine_english_compound_words=False,
 ):
@@ -30,6 +34,7 @@ def tokenize_and_merge_files(
 
     botok_tokenizer_obj = load_botok_word_tokenizer()
     spacy_tokenizer_obj = load_spacy_word_tokenizer()
+    MONLAM_2020 = load_MONLAM_2020_word_dict()
 
     # Updated merging code with tokenization and ensuring non-empty pairs
     with open(source_out_file, "w", encoding="utf-8") as source_out, open(
@@ -80,6 +85,10 @@ def tokenize_and_merge_files(
                                 split_affix,
                                 tibetan_lemma,
                             )
+                            if combine_tibetan_compound_words:
+                                tgt_line = combine_compound_words_MONLAM2020(
+                                    MONLAM_2020, tgt_line
+                                )
 
                             if src_line and tgt_line:
                                 source_out.write(src_line + "\n")
