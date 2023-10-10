@@ -40,7 +40,7 @@ def combine_compound_words_MONLAM2020(word_dict, sentence):
                 current_phrase = "".join(words[i : j + 1])  # noqa
                 if current_phrase in word_dict[first_char]:
                     # Replace the phrase with the joined form using "+"
-                    words[i] = current_phrase.replace(" ", "+")
+                    words[i] = "+".join(words[i : j + 1])  # noqa
                     del words[i + 1 : j + 1]  # noqa
                     break
         i += 1
@@ -51,4 +51,4 @@ if __name__ == "__main__":
     # Example usage:
     text = "ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་པ ས་"
     MONLAM_2020 = load_MONLAM_2020_word_dict()
-    print(combine_compound_words_MONLAM2020(text, MONLAM_2020))
+    print(combine_compound_words_MONLAM2020(MONLAM_2020, text))
