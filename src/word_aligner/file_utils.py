@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import List
 
-from .config import RESOURCE_FOLDER_DIR, TMs_30, TMs_4006
+from word_aligner.config import RESOURCE_FOLDER_DIR, TMs_30, TMs_4006
 
 BO_EN_FILE_PATH = Path(RESOURCE_FOLDER_DIR / "bo_en_list.txt")
 
