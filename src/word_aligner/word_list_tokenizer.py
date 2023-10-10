@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Dict, List
 
-from word_aligner.config import PUNCTS, RESOURCE_FOLDER_DIR
+from word_aligner.config import RESOURCE_FOLDER_DIR
 
 
 def load_MONLAM_2020_word_list():
@@ -30,48 +30,25 @@ def group_words_by_first_character(word_list: List[str]) -> dict:
     return word_dict
 
 
-def tokenize_tibetan_word_list(text, word_dict: dict) -> str:
-    tokens = []
-    index = 0
-
-    while index < len(text):
-        match_found = False
-        first_char = text[index]
-
-        # Check if the first character of the text matches any key in the word_dict
+def combine_compound_words_MONLAM2020(sentence, word_dict):
+    words = sentence.split()
+    i = 0
+    while i < len(words):
+        first_char = words[i][0]
         if first_char in word_dict:
-            for word in word_dict[first_char]:
-                if text.startswith(word, index):
-                    tokens.append(word)
-                    index += len(word)
-                    match_found = True
+            for j in range(len(words) - 1, -1, -1):
+                current_phrase = "".join(words[i : j + 1])  # noqa
+                if current_phrase in word_dict[first_char]:
+                    # Replace the phrase with the joined form using "+"
+                    words[i] = current_phrase.replace(" ", "+")
+                    del words[i + 1 : j + 1]  # noqa
                     break
-
-        if match_found:
-            continue
-
-        # Check if the text starting at the current index matches any punctuation
-        for punct in PUNCTS:
-            if text.startswith(punct, index):
-                tokens.append(punct)
-                index += len(punct)
-                match_found = True
-                break
-
-        if not match_found:
-            tsek_next_occur = text.find("་", index)
-            if tsek_next_occur == -1:
-                tsek_next_occur = len(text)
-
-            tokens.append(text[index : tsek_next_occur + 1])  # noqa
-            index = tsek_next_occur + 1
-
-    return " ".join(tokens)
+        i += 1
+    return " ".join(words)
 
 
 if __name__ == "__main__":
     # Example usage:
-    text = "དེའི་བདག་ཉིད་སྡུག་བསྔལ་བའི་འགྲོ་བ་ལ་སྙིང་རྗེ་བ་གང་ཡིན་པའི་སྙིང་རྗེ་དེའི་ཕྱིར་རོ།།"
+    text = "ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་པ ས་"
     MONLAM_2020 = load_MONLAM_2020_word_list()
-    tokens = tokenize_tibetan_word_list(text, MONLAM_2020)
-    print(tokens)
+    print(combine_compound_words_MONLAM2020(text, MONLAM_2020))
