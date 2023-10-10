@@ -30,7 +30,9 @@ def group_words_by_first_character(word_list: List[str]) -> dict:
     return word_dict
 
 
-def combine_compound_words_MONLAM2020(word_dict, sentence):
+def combine_compound_words_MONLAM2020(word_dict: Dict, sentence: str):
+    # Input:> sentence = "ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་པ ས་"
+    # output:> sentence = "ས་+ཆེན་+ཀུན་དགའ་+བློ་གྲོས་ ཡིན་པ ས་"
     words = sentence.split()
     i = 0
     while i < len(words):
@@ -49,6 +51,6 @@ def combine_compound_words_MONLAM2020(word_dict, sentence):
 
 if __name__ == "__main__":
     # Example usage:
-    text = "ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་པ ས་"
+    text = "ང་ ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་"
     MONLAM_2020 = load_MONLAM_2020_word_dict()
     print(combine_compound_words_MONLAM2020(MONLAM_2020, text))
