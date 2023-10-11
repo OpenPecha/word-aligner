@@ -4,18 +4,15 @@ from typing import Dict, List
 from botok import TSEK
 
 from word_aligner.config import RESOURCE_FOLDER_DIR
-from word_aligner.data_processor import normalise_tsek
+from word_aligner.data_processor import add_tsek_if_missing_in_list, normalise_tsek
 
 
 def load_MONLAM_2020_word_list():
     MONLAM_2020 = Path(RESOURCE_FOLDER_DIR / "སྨོན་2020-headwords.csv").read_text(
         encoding="utf-8"
     )
-    MONLAM_2020_lines = normalise_tsek(MONLAM_2020).splitlines()
-    MONLAM_2020_word_list = [
-        word + TSEK if word[-1] not in ["་", "ཿ"] else word
-        for word in MONLAM_2020_lines
-    ]
+    MONLAM_2020_word_list = normalise_tsek(MONLAM_2020).splitlines()
+    MONLAM_2020_word_list = add_tsek_if_missing_in_list(MONLAM_2020_word_list)
     return MONLAM_2020_word_list
 
 
@@ -23,12 +20,12 @@ def load_mahavyutpatti_word_list():
     mahavyutpatti = Path(RESOURCE_FOLDER_DIR / "mahavyutpatti.csv").read_text(
         encoding="utf-8"
     )
-    mahavyutpatti_lines = normalise_tsek(mahavyutpatti).splitlines()
-    mahavyutpatti_lines = [line.split(",")[0].strip() for line in mahavyutpatti_lines]
+    mahavyutpatti_word_list = normalise_tsek(mahavyutpatti).splitlines()
+    # Filtering only tibetan words
     mahavyutpatti_word_list = [
-        word + TSEK if word[-1] not in ["་", "ཿ"] else word
-        for word in mahavyutpatti_lines
+        line.split(",")[0].strip() for line in mahavyutpatti_word_list
     ]
+    mahavyutpatti_word_list = add_tsek_if_missing_in_list(mahavyutpatti_word_list)
     return mahavyutpatti_word_list
 
 
@@ -87,4 +84,6 @@ def merge_tibetan_compound_words(word_dict: Dict, sentence: str):
 
 if __name__ == "__main__":
     # Example usage:
-    pass
+    word_list = load_all_word_list()
+    word_list = "\n".join(word_list)
+    Path(RESOURCE_FOLDER_DIR / "all_words.txt").write_text(word_list)
