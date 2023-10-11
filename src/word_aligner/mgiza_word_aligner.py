@@ -131,7 +131,7 @@ def group_consecutive_indices(indices):
     return groups
 
 
-def execute_mgiza():
+def execute_mgiza(threshold_frequency=1):
 
     # Set paths
     data_dir = "data"
@@ -233,18 +233,31 @@ def execute_mgiza():
         )
 
     # Process word alignments to get unique strings with frequencies and order them
+    filtered_word_alignments = {}
     for target_word, source_phrases in word_alignments.items():
         counter = Counter(source_phrases)
-        ordered_phrases = sorted(counter.items(), key=lambda x: x[1], reverse=True)
-        word_alignments[target_word] = [
+
+        # Filter phrases based on the threshold
+        filtered_phrases = {
+            phrase: count
+            for phrase, count in counter.items()
+            if count >= threshold_frequency
+        }
+
+        if not filtered_phrases:
+            continue
+        ordered_phrases = sorted(
+            filtered_phrases.items(), key=lambda x: x[1], reverse=True
+        )
+        filtered_word_alignments[target_word] = [
             f"{phrase}_{count}" for phrase, count in ordered_phrases
         ]
 
     # Write results to output file
     print("Writing to aligned_words.txt...")
     with open(out_file, "w", encoding="utf-8") as out:
-        for target_word in sorted(word_alignments.keys()):
-            source_words = ", ".join(word_alignments[target_word])
+        for target_word in sorted(filtered_word_alignments.keys()):
+            source_words = ", ".join(filtered_word_alignments[target_word])
             out.write(f"{target_word}: {source_words}\n")
 
     print("Writing complete.")
