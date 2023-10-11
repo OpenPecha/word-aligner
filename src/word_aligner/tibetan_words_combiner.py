@@ -35,8 +35,7 @@ def load_all_word_list():
     return word_list
 
 
-def load_tibetan_word_dictionary():
-    word_list = load_all_word_list()
+def load_tibetan_word_dictionary(word_list: List[str] = load_all_word_list()):
     word_dict = group_words_by_first_character(word_list)
     return word_dict
 
