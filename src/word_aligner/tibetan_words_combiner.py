@@ -46,8 +46,14 @@ def combine_compound_words_MONLAM2020(word_dict: Dict, sentence: str):
         if first_char in word_dict:
             for j in range(len(words) - 1, -1, -1):
                 current_phrase = "".join(words[i : j + 1])  # noqa
+                is_end_tsek = current_phrase[-1] in ["་", "ཿ"]
                 if current_phrase in word_dict[first_char]:
                     # Replace the phrase with the joined form using "+"
+                    words[i] = "+".join(words[i : j + 1])  # noqa
+                    del words[i + 1 : j + 1]  # noqa
+                    break
+                elif not is_end_tsek and current_phrase + TSEK in word_dict[first_char]:
+                    # If is_end_tsek is False, check for current_phrase + "་"
                     words[i] = "+".join(words[i : j + 1])  # noqa
                     del words[i + 1 : j + 1]  # noqa
                     break
@@ -58,5 +64,6 @@ def combine_compound_words_MONLAM2020(word_dict: Dict, sentence: str):
 if __name__ == "__main__":
     # Example usage:
     text = "ང་ ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་"
+    text = "དྷ་ ར"
     MONLAM_2020 = load_MONLAM_2020_word_dict()
     print(combine_compound_words_MONLAM2020(MONLAM_2020, text))
