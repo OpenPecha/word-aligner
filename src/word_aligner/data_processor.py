@@ -11,7 +11,8 @@ def keep_only_tibetan_characters(text: str) -> str:
 
 
 def keep_only_english_characters(text: str) -> str:
-    return re.sub(r"[^a-zA-Z0-9\s\n\t]+", r"", text)
+    # keep only ascii characters
+    return re.sub(r"[^\x00-\x7F]", r"", text)
 
 
 def normalise_punctuation(text: str) -> str:
@@ -21,18 +22,20 @@ def normalise_punctuation(text: str) -> str:
 
 
 def clean_tibetan_text(text: str) -> str:
+    text = keep_only_tibetan_characters(text)
     text = clean_text(text)
     text = re.sub(r"[ ]+", "", text).strip()
     return text
 
 
 def clean_english_text(text: str) -> str:
+    text = keep_only_english_characters(text)
     text = clean_text(text)
     text = re.sub(r"[ ]+", " ", text).strip()
     return text
 
 
-def clean_text(text: str, is_tibetan=False) -> str:
+def clean_text(text: str) -> str:
     text = remove_number_emojis(text)
     text = normalise_punctuation(text)
     return text
