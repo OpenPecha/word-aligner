@@ -1,5 +1,7 @@
 import re
 
+from botok import TSEK
+
 
 def remove_number_emojis(text: str) -> str:
     # 1️⃣, 2️⃣, 3️⃣ annotations were used for machine translation evaluation
@@ -24,7 +26,9 @@ def normalise_punctuation(text: str) -> str:
 def clean_tibetan_text(text: str) -> str:
     text = keep_only_tibetan_characters(text)
     text = clean_text(text)
+    text = re.sub(r"[་༌]", TSEK, text)
     text = re.sub(r"[ ]+", "", text).strip()
+
     return text
 
 
