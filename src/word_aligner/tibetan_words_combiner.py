@@ -1,16 +1,22 @@
 from pathlib import Path
 from typing import Dict, List
 
+from botok import TSEK
+
 from word_aligner.config import RESOURCE_FOLDER_DIR
+from word_aligner.data_processor import normalise_tsek
 
 
 def load_MONLAM_2020_word_dict():
-    MONLAM_2020 = (
-        Path(RESOURCE_FOLDER_DIR / "སྨོན་2020-headwords.csv")
-        .read_text(encoding="utf-8")
-        .splitlines()
+    MONLAM_2020 = Path(RESOURCE_FOLDER_DIR / "སྨོན་2020-headwords.csv").read_text(
+        encoding="utf-8"
     )
-    MONLAM_2020_word_dict = group_words_by_first_character(MONLAM_2020)
+    MONLAM_2020_lines = normalise_tsek(MONLAM_2020).splitlines()
+    MONLAM_2020_normalised = [
+        word + TSEK if word[-1] not in ["་", "ཿ"] else word
+        for word in MONLAM_2020_lines
+    ]
+    MONLAM_2020_word_dict = group_words_by_first_character(MONLAM_2020_normalised)
     return MONLAM_2020_word_dict
 
 
