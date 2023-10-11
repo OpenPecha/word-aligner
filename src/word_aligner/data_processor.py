@@ -1,4 +1,7 @@
 import re
+from typing import List
+
+from botok import TSEK
 
 
 def remove_number_emojis(text: str) -> str:
@@ -21,9 +24,14 @@ def normalise_punctuation(text: str) -> str:
     return text
 
 
+def normalise_tsek(text: str) -> str:
+    return re.sub(r"[་༌]", TSEK, text)
+
+
 def clean_tibetan_text(text: str) -> str:
     text = keep_only_tibetan_characters(text)
     text = clean_text(text)
+    text = normalise_tsek(text)
     text = re.sub(r"[ ]+", "", text).strip()
     return text
 
@@ -39,6 +47,13 @@ def clean_text(text: str) -> str:
     text = remove_number_emojis(text)
     text = normalise_punctuation(text)
     return text
+
+
+def add_tsek_if_missing_in_list(word_list: List) -> list:
+    normalised_word_list = [
+        word + TSEK if word[-1] not in ["་", "ཿ"] else word for word in word_list
+    ]
+    return normalised_word_list
 
 
 if __name__ == "__main__":

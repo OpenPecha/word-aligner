@@ -7,8 +7,8 @@ from typing import Dict
 
 from word_aligner.data_processor import clean_english_text, clean_tibetan_text
 from word_aligner.tibetan_words_combiner import (
-    combine_compound_words_MONLAM2020,
-    load_MONLAM_2020_word_dict,
+    load_tibetan_word_dictionary,
+    merge_tibetan_compound_words,
 )
 from word_aligner.word_tokenizer import (
     load_botok_word_tokenizer,
@@ -35,7 +35,7 @@ def tokenize_and_merge_files(
 
     botok_tokenizer_obj = load_botok_word_tokenizer()
     spacy_tokenizer_obj = load_spacy_word_tokenizer()
-    MONLAM_2020 = load_MONLAM_2020_word_dict()
+    TIBETAN_WORD_DICTIONARY = load_tibetan_word_dictionary()
 
     # Updated merging code with tokenization and ensuring non-empty pairs
     with open(source_out_file, "w", encoding="utf-8") as source_out, open(
@@ -89,8 +89,8 @@ def tokenize_and_merge_files(
                                 tibetan_lemma,
                             )
                             if combine_tibetan_compound_words:
-                                tgt_line = combine_compound_words_MONLAM2020(
-                                    MONLAM_2020, tgt_line
+                                tgt_line = merge_tibetan_compound_words(
+                                    TIBETAN_WORD_DICTIONARY, tgt_line
                                 )
 
                             if src_line and tgt_line:

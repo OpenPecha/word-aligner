@@ -1,14 +1,14 @@
 from word_aligner.tibetan_words_combiner import (
-    combine_compound_words_MONLAM2020,
-    load_MONLAM_2020_word_dict,
+    load_tibetan_word_dictionary,
+    merge_tibetan_compound_words,
 )
 
 
 def test_combine_compound_words_MONLAM2020():
-    MONLAM_2020 = load_MONLAM_2020_word_dict()
+    TIBETAN_WORD_DICT = load_tibetan_word_dictionary()
     test_sentence = "ང་ ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་"
-    combined_words_sentence = combine_compound_words_MONLAM2020(
-        MONLAM_2020, test_sentence
+    combined_words_sentence = merge_tibetan_compound_words(
+        TIBETAN_WORD_DICT, test_sentence
     )
     expected_sentence = "ང་ ས་+ཆེན་+ཀུན་དགའ་+བློ་གྲོས་ ཡིན་"
 
