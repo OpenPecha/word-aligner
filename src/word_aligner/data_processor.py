@@ -23,12 +23,15 @@ def normalise_punctuation(text: str) -> str:
     return text
 
 
+def normalise_tsek(text: str) -> str:
+    return re.sub(r"[་༌]", TSEK, text)
+
+
 def clean_tibetan_text(text: str) -> str:
     text = keep_only_tibetan_characters(text)
     text = clean_text(text)
-    text = re.sub(r"[་༌]", TSEK, text)
+    text = normalise_tsek(text)
     text = re.sub(r"[ ]+", "", text).strip()
-
     return text
 
 
