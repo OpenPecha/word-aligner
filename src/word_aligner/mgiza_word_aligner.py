@@ -224,7 +224,7 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
                     grouped_indices = group_consecutive_indices(indices)
                     grouped_source_words = [
-                        "".join(source_tokens[idx - 1] for idx in group)
+                        "-".join(source_tokens[idx - 1] for idx in group)
                         for group in grouped_indices
                     ]
 
