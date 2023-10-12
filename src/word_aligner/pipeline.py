@@ -9,6 +9,7 @@ def pipeline(
     combine_english_compound_words=False,
     num_files_to_train=1,
     threshold_frequency=1,
+    is_source_file_english=True,
 ):
     """
     Tibetan tokenizer options
@@ -25,7 +26,10 @@ def pipeline(
         combine_english_compound_words=combine_english_compound_words,
         num_files_to_train=num_files_to_train,
     )
-    execute_mgiza(threshold_frequency=threshold_frequency)
+    execute_mgiza(
+        threshold_frequency=threshold_frequency,
+        is_source_file_english=is_source_file_english,
+    )
 
 
 if __name__ == "__main__":
@@ -37,4 +41,5 @@ if __name__ == "__main__":
         combine_english_compound_words=True,
         num_files_to_train=1,
         threshold_frequency=3,
+        is_source_file_english=False,
     )

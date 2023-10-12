@@ -131,12 +131,17 @@ def group_consecutive_indices(indices):
     return groups
 
 
-def execute_mgiza(threshold_frequency=1):
+def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
     # Set paths
     data_dir = "data"
     source_path = os.path.join(data_dir, "english")
     target_path = os.path.join(data_dir, "tibetan")
+
+    if not is_source_file_english:
+        source_path = os.path.join(data_dir, "tibetan")
+        target_path = os.path.join(data_dir, "english")
+
     out_file = os.path.join(data_dir, "aligned_words.txt")
 
     # Convert plain text data to the snt format expected by mgiza++
