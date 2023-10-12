@@ -68,12 +68,13 @@ def split_list_into_sublists_by_shad(words: List[str]) -> List[List[str]]:
             j = i
             while j < words_length and "།" in words[j]:
                 j += 1
-            sublist = words[last_shad_index:j]
-            list_of_sublists.append(sublist)
-            last_shad_index = j
-            i = j + 1
+            list_of_sublists.append(words[last_shad_index:j])
+            last_shad_index = j - 1
+            i = j
             continue
         i += 1
+    if last_shad_index < words_length - 1:
+        list_of_sublists.append(words[last_shad_index:])
     return list_of_sublists
 
 
@@ -113,5 +114,7 @@ def merge_tibetan_compound_words(word_dict: Dict, sentence: str):
 if __name__ == "__main__":
     # Example usage:
     TIBETAN_DICTIONARY = load_tibetan_word_dictionary()
-    test_sentence = "ང་ ཚོས་ འགྲོ་བ་+མི འི་ རང་གཤིས་ དང་ འབྲེལ་བ་ བརླགས་ ཚར་བ་ རེད །"
+    test_sentence = (
+        "ང་ ཚོས་ འགྲོ་བ་+མི འི་ རང་གཤིས་ དང་ འབྲེལ་བ་ བརླགས་ ཚར་བ་ རེད །  འབྲེལ་བ་"
+    )
     print(merge_tibetan_compound_words(TIBETAN_DICTIONARY, test_sentence))
