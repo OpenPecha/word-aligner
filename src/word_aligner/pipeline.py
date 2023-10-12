@@ -36,7 +36,7 @@ if __name__ == "__main__":
     pipeline(
         split_affix=True,
         tibetan_lemma=False,
-        combine_tibetan_compound_words=False,
+        combine_tibetan_compound_words=True,
         english_lemma=True,
         combine_english_compound_words=True,
         num_files_to_train=1,

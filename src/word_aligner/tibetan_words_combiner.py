@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from botok import TSEK
 
-from word_aligner.config import RESOURCE_FOLDER_DIR
+from word_aligner.config import CLOSING_PUNCTS, RESOURCE_FOLDER_DIR
 from word_aligner.data_processor import add_tsek_if_missing_in_list, normalise_tsek
 
 
@@ -56,33 +56,67 @@ def group_words_by_first_character(word_list: List[str]) -> dict:
     return word_dict
 
 
+def split_list_into_sublists_by_closing_puncts(words: List[str]) -> List[List[str]]:
+    # Input:> words = ["ཁྱོད", "འཆི་དུས་", "སུ་", "ངུ་", "སྲིད", "།", "རོ་"]
+    # Output:> words = [["ཁྱོད","འཆི་དུས་", "སུ་", "ངུ་", "སྲིད", "།"], ["རོ་"]]
+    list_of_sublists = []
+    words_length = len(words)
+    i = 0
+    last_punct_index = 0
+    while i < words_length:
+        if any(punct in words[i] for punct in CLOSING_PUNCTS):
+            j = i
+            while j < words_length and any(
+                punct in words[j] for punct in CLOSING_PUNCTS
+            ):
+                j += 1
+            list_of_sublists.append(words[last_punct_index:j])
+            last_punct_index = j - 1
+            i = j
+            continue
+        i += 1
+    if last_punct_index < words_length - 1:
+        list_of_sublists.append(words[last_punct_index:])
+    return list_of_sublists
+
+
 def merge_tibetan_compound_words(word_dict: Dict, sentence: str):
     # Input:> sentence = "ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་པ ས་"
     # output:> sentence = "ས་+ཆེན་+ཀུན་དགའ་+བློ་གྲོས་ ཡིན་པ ས་"
-    words = sentence.split()
-    i = 0
-    while i < len(words):
-        first_char = words[i][0]
-        if first_char in word_dict:
-            for j in range(len(words) - 1, -1, -1):
-                current_phrase = "".join(words[i : j + 1])  # noqa
-                is_end_tsek = current_phrase[-1] in ["་", "ཿ"]
-                if current_phrase in word_dict[first_char]:
-                    # Replace the phrase with the joined form using "+"
-                    words[i] = "+".join(words[i : j + 1])  # noqa
-                    del words[i + 1 : j + 1]  # noqa
-                    break
-                elif not is_end_tsek and current_phrase + TSEK in word_dict[first_char]:
-                    # If is_end_tsek is False, check for current_phrase + "་"
-                    words[i] = "+".join(words[i : j + 1])  # noqa
-                    del words[i + 1 : j + 1]  # noqa
-                    break
-        i += 1
-    return " ".join(words)
+    tokenized_words = sentence.split()
+    words_list_of_list = split_list_into_sublists_by_closing_puncts(tokenized_words)
+
+    final_sentence = ""
+    for words in words_list_of_list:
+        i = 0
+        while i < len(words):
+            first_char = words[i][0]
+            if first_char in word_dict:
+                for j in range(len(words) - 1, i, -1):
+                    current_phrase = "".join(words[i : j + 1])  # noqa
+                    is_end_tsek = current_phrase[-1] in ["་", "ཿ"]
+                    if current_phrase in word_dict[first_char]:
+                        # Replace the phrase with the joined form using "+"
+                        words[i] = "+".join(words[i : j + 1])  # noqa
+                        del words[i + 1 : j + 1]  # noqa
+                        break
+                    elif (
+                        not is_end_tsek
+                        and current_phrase + TSEK in word_dict[first_char]
+                    ):
+                        # If is_end_tsek is False, check for current_phrase + "་"
+                        words[i] = "+".join(words[i : j + 1])  # noqa
+                        del words[i + 1 : j + 1]  # noqa
+                        break
+            i += 1
+        final_sentence += " ".join(words)
+    return final_sentence
 
 
 if __name__ == "__main__":
     # Example usage:
-    word_list = load_all_word_list()
-    word_list = "\n".join(word_list)
-    Path(RESOURCE_FOLDER_DIR / "all_words.txt").write_text(word_list)
+    TIBETAN_DICTIONARY = load_tibetan_word_dictionary()
+    test_sentence = (
+        "ང་ ཚོས་ འགྲོ་བ་+མི འི་ རང་གཤིས་ དང་ འབྲེལ་བ་ བརླགས་ ཚར་བ་ རེད །  འབྲེལ་བ་"
+    )
+    print(merge_tibetan_compound_words(TIBETAN_DICTIONARY, test_sentence))
