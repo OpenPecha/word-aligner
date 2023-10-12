@@ -64,7 +64,7 @@ def merge_tibetan_compound_words(word_dict: Dict, sentence: str):
     while i < len(words):
         first_char = words[i][0]
         if first_char in word_dict:
-            for j in range(len(words) - 1, -1, -1):
+            for j in range(len(words) - 1, i, -1):
                 current_phrase = "".join(words[i : j + 1])  # noqa
                 is_end_tsek = current_phrase[-1] in ["་", "ཿ"]
                 if current_phrase in word_dict[first_char]:
