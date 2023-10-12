@@ -30,74 +30,74 @@ def tokenize_and_merge_files(
     # Paths
     data_dir = "data"
     input_dir = os.path.join(data_dir, "input")
-    source_out_file = os.path.join(data_dir, "source.txt")
-    target_out_file = os.path.join(data_dir, "target.txt")
+    english_out_file = os.path.join(data_dir, "english.txt")
+    tibetan_out_file = os.path.join(data_dir, "tibetan.txt")
 
     botok_tokenizer_obj = load_botok_word_tokenizer()
     spacy_tokenizer_obj = load_spacy_word_tokenizer()
     TIBETAN_WORD_DICTIONARY = load_tibetan_word_dictionary()
 
     # Updated merging code with tokenization and ensuring non-empty pairs
-    with open(source_out_file, "w", encoding="utf-8") as source_out, open(
-        target_out_file, "w", encoding="utf-8"
-    ) as target_out:
+    with open(english_out_file, "w", encoding="utf-8") as english_out, open(
+        tibetan_out_file, "w", encoding="utf-8"
+    ) as tibetan_out:
         for subdir in os.listdir(input_dir):
 
             full_subdir_path = os.path.join(input_dir, subdir)
             if os.path.isdir(full_subdir_path):
                 files_in_subdir = os.listdir(full_subdir_path)
-                source_files = [f for f in files_in_subdir if f.endswith("-en.txt")]
-                target_files = [f for f in files_in_subdir if f.endswith("-bo.txt")]
+                english_files = [f for f in files_in_subdir if f.endswith("-en.txt")]
+                tibetan_files = [f for f in files_in_subdir if f.endswith("-bo.txt")]
 
-                source_files = sorted(source_files)[:num_files_to_train]
-                target_files = sorted(target_files)[:num_files_to_train]
+                english_files = sorted(english_files)[:num_files_to_train]
+                tibetan_files = sorted(tibetan_files)[:num_files_to_train]
 
-                if len(source_files) != len(target_files):
+                if len(english_files) != len(tibetan_files):
                     print(
                         f"Warning: Mismatch in number of files in {full_subdir_path}. Skipping this folder."
                     )
                     continue
 
-                for src_file, tgt_file in zip(
-                    sorted(source_files), sorted(target_files)
+                for english_file, tibetan_file in zip(
+                    sorted(english_files), sorted(tibetan_files)
                 ):
                     with open(
-                        os.path.join(full_subdir_path, src_file), encoding="utf-8"
-                    ) as src, open(
-                        os.path.join(full_subdir_path, tgt_file), encoding="utf-8"
-                    ) as tgt:
-                        src_lines = src.readlines()
-                        tgt_lines = tgt.readlines()
+                        os.path.join(full_subdir_path, english_file), encoding="utf-8"
+                    ) as eng, open(
+                        os.path.join(full_subdir_path, tibetan_file), encoding="utf-8"
+                    ) as bo:
+                        en_lines = eng.readlines()
+                        bo_lines = bo.readlines()
 
-                        for src_line, tgt_line in zip(src_lines, tgt_lines):
+                        for en_line, bo_line in zip(en_lines, bo_lines):
                             if combine_english_compound_words:
-                                src_line = tokenize_english_with_named_entities(
+                                en_line = tokenize_english_with_named_entities(
                                     spacy_tokenizer_obj,
-                                    clean_english_text(src_line),
+                                    clean_english_text(en_line),
                                     english_lemma,
                                 )
                             else:
-                                src_line = tokenize_english_with_spacy(
+                                en_line = tokenize_english_with_spacy(
                                     spacy_tokenizer_obj,
-                                    clean_english_text(src_line),
+                                    clean_english_text(en_line),
                                     english_lemma,
                                 )
-                            tgt_line = tokenize_tibetan_with_botok(
+                            bo_line = tokenize_tibetan_with_botok(
                                 botok_tokenizer_obj,
-                                clean_tibetan_text(tgt_line),
+                                clean_tibetan_text(bo_line),
                                 split_affix,
                                 tibetan_lemma,
                             )
                             if combine_tibetan_compound_words:
-                                tgt_line = merge_tibetan_compound_words(
-                                    TIBETAN_WORD_DICTIONARY, tgt_line
+                                bo_line = merge_tibetan_compound_words(
+                                    TIBETAN_WORD_DICTIONARY, bo_line
                                 )
 
-                            if src_line and tgt_line:
-                                source_out.write(src_line + "\n")
-                                target_out.write(tgt_line + "\n")
+                            if en_line and bo_line:
+                                english_out.write(en_line + "\n")
+                                tibetan_out.write(bo_line + "\n")
 
-    print(f"Data merged into {source_out_file} and {target_out_file}.")
+    print(f"Data merged into {english_out_file} and {tibetan_out_file}.")
 
 
 # Function to read vcb files and return a dictionary
@@ -135,8 +135,8 @@ def execute_mgiza(threshold_frequency=1):
 
     # Set paths
     data_dir = "data"
-    source_path = os.path.join(data_dir, "source")
-    target_path = os.path.join(data_dir, "target")
+    source_path = os.path.join(data_dir, "english")
+    target_path = os.path.join(data_dir, "tibetan")
     out_file = os.path.join(data_dir, "aligned_words.txt")
 
     # Convert plain text data to the snt format expected by mgiza++
