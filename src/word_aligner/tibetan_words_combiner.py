@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from botok import TSEK
 
-from word_aligner.config import RESOURCE_FOLDER_DIR
+from word_aligner.config import CLOSING_PUNCTS, RESOURCE_FOLDER_DIR
 from word_aligner.data_processor import add_tsek_if_missing_in_list, normalise_tsek
 
 
@@ -56,25 +56,27 @@ def group_words_by_first_character(word_list: List[str]) -> dict:
     return word_dict
 
 
-def split_list_into_sublists_by_shad(words: List[str]) -> List[List[str]]:
+def split_list_into_sublists_by_closing_puncts(words: List[str]) -> List[List[str]]:
     # Input:> words = ["ཁྱོད", "འཆི་དུས་", "སུ་", "ངུ་", "སྲིད", "།", "རོ་"]
     # Output:> words = [["ཁྱོད","འཆི་དུས་", "སུ་", "ངུ་", "སྲིད", "།"], ["རོ་"]]
     list_of_sublists = []
     words_length = len(words)
     i = 0
-    last_shad_index = 0
+    last_punct_index = 0
     while i < words_length:
-        if "།" in words[i]:
+        if any(punct in words[i] for punct in CLOSING_PUNCTS):
             j = i
-            while j < words_length and "།" in words[j]:
+            while j < words_length and any(
+                punct in words[j] for punct in CLOSING_PUNCTS
+            ):
                 j += 1
-            list_of_sublists.append(words[last_shad_index:j])
-            last_shad_index = j - 1
+            list_of_sublists.append(words[last_punct_index:j])
+            last_punct_index = j - 1
             i = j
             continue
         i += 1
-    if last_shad_index < words_length - 1:
-        list_of_sublists.append(words[last_shad_index:])
+    if last_punct_index < words_length - 1:
+        list_of_sublists.append(words[last_punct_index:])
     return list_of_sublists
 
 
@@ -82,7 +84,7 @@ def merge_tibetan_compound_words(word_dict: Dict, sentence: str):
     # Input:> sentence = "ས་ ཆེན་ ཀུན་དགའ་ བློ་གྲོས་ ཡིན་པ ས་"
     # output:> sentence = "ས་+ཆེན་+ཀུན་དགའ་+བློ་གྲོས་ ཡིན་པ ས་"
     tokenized_words = sentence.split()
-    words_list_of_list = split_list_into_sublists_by_shad(tokenized_words)
+    words_list_of_list = split_list_into_sublists_by_closing_puncts(tokenized_words)
 
     final_sentence = ""
     for words in words_list_of_list:
