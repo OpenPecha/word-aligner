@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 
 import openpyxl
+from ordered_set import OrderedSet
 
 
 def extract_text_in_double_quotes(sentence):
@@ -11,7 +12,7 @@ def extract_text_in_double_quotes(sentence):
     return text_in_single_quotes
 
 
-def read_excel_tibetan_to_english(file_path):
+def read_excel_and_extract_tibetan_english_pair(file_path):
     data = {}
     workbook = openpyxl.load_workbook(file_path)
     sheet = workbook.active
@@ -20,6 +21,7 @@ def read_excel_tibetan_to_english(file_path):
         if not tibetan_word or not word_description:
             continue
         english_words = extract_text_in_double_quotes(word_description)
+        english_words = list(OrderedSet(english_words))
         if english_words:
             data[tibetan_word] = english_words
     return data
@@ -34,6 +36,6 @@ if __name__ == "__main__":
     # Example usage:
     RESOURCES_FOLDER_DIR = Path(__file__).parent / "resources"
     file_path = RESOURCES_FOLDER_DIR / "Illuminator.xlsx"
-    tibetan_english_dict = read_excel_tibetan_to_english(file_path)
+    tibetan_english_dict = read_excel_and_extract_tibetan_english_pair(file_path)
     json_output_file_path = RESOURCES_FOLDER_DIR / "tibetan_english_dict.json"
     write_dictionary_to_json(tibetan_english_dict, json_output_file_path)
