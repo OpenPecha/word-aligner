@@ -1,23 +1,28 @@
+import re
 from pathlib import Path
 
 import openpyxl
 
 
+def extract_text_in_double_quotes(sentence):
+    # Use regular expressions to find text in single quotes
+    text_in_single_quotes = re.findall(r'"(.*?)"', sentence)
+    return text_in_single_quotes
+
+
 def read_excel_tibetan_to_english(file_path):
     data = {}
-    try:
-        workbook = openpyxl.load_workbook(file_path)
-        sheet = workbook.active
+    workbook = openpyxl.load_workbook(file_path)
+    sheet = workbook.active
+    for row in sheet.iter_rows(values_only=True):
+        tibetan_word, word_description = row[0], row[1]
+        if not tibetan_word or not word_description:
+            continue
+        english_words = extract_text_in_double_quotes(word_description)
+        if english_words:
+            data[tibetan_word] = english_words
 
-        for row in sheet.iter_rows(values_only=True):
-            if len(row) >= 2:
-                tibetan_word, english_word = row[0], row[1]
-                data[tibetan_word] = english_word
-
-        return data
-    except Exception as e:
-        print(f"File: {file_path} An error occurred: {e}")
-        return None
+    return data
 
 
 if __name__ == "__main__":
