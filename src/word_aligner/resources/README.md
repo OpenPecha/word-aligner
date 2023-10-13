@@ -25,3 +25,21 @@ Contains all the headwords from the dictionary སྨོན་2020. The file is 
 
 link: https://github.com/OpenPecha/dictionaries
 folder: bo-bo
+
+
+## mahavyutpatti.csv
+
+Contains tibetan words and its corresponding sanskrit translation from the dictionary mahavyutpatti.
+The file is used to get the list of tibetan words.
+
+link: https://github.com/OpenPecha/dictionaries
+folder: bo-san
+
+## Illuminator.xlsx
+
+Contains tibetan words, thier description / defination and english words if possible in double quotes.
+link: https://github.com/OpenPecha/dictionaries
+folder: bo-en
+
+## tibetan_english_dictionary.json
+Contains tibetan words and their corresponding english words parse from Illuminator.xlsx file.
