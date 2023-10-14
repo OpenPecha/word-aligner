@@ -24,7 +24,7 @@ def keep_neccessary_english_characters(text: str) -> str:
     return re.sub(r"[^a-zA-Z0-9\s\n\t\.\,\?\!\'\$\&\+\%]+", r"", text)
 
 
-def keep_neccessary_english_characters_for_dictionary(text: str) -> str:
+def filter_for_english_dictionary_words(text: str) -> str:
     # if non neccessary ascii characters was in between
     text = re.sub(r"[*|+]{1}[^a-zA-Z0-9\-\$\*\+]+[*|+]{1}", r"*", text)
     # if non neccessary ascii characters was in beginning or end
@@ -32,7 +32,7 @@ def keep_neccessary_english_characters_for_dictionary(text: str) -> str:
     return text
 
 
-def keep_neccessary_tibetan_characters_for_dictionary(text: str) -> str:
+def filter_for_tibetan_dictionary_words(text: str) -> str:
     # if closing_puncts was in between
     pattern = r"[*|+]{1}" + CLOSING_PUNCTS_CHAR_SET + "+[*|+]{1}"
     text = re.sub(pattern, r"*", text)

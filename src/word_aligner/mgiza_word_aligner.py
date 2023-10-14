@@ -5,7 +5,12 @@ import subprocess
 from collections import Counter
 from typing import Dict
 
-from word_aligner.data_processor import clean_english_text, clean_tibetan_text
+from word_aligner.data_processor import (
+    clean_english_text,
+    clean_tibetan_text,
+    filter_for_english_dictionary_words,
+    filter_for_tibetan_dictionary_words,
+)
 from word_aligner.tibetan_words_combiner import (
     load_tibetan_word_dictionary,
     merge_tibetan_compound_words,
@@ -237,6 +242,29 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
         print(
             f"Number of alignments captured after processing {alignment_file}: {len(word_alignments)}"
         )
+
+    # Cleaning the words before writing to file
+
+    if is_source_file_english:
+        word_alignments = {
+            filter_for_english_dictionary_words(word): [
+                filter_for_tibetan_dictionary_words(phrase)
+                for phrase in phrases
+                if filter_for_tibetan_dictionary_words(phrase) != ""
+            ]
+            for word, phrases in word_alignments.items()
+            if filter_for_english_dictionary_words(word) != ""
+        }
+    else:
+        word_alignments = {
+            filter_for_tibetan_dictionary_words(word): [
+                filter_for_english_dictionary_words(phrase)
+                for phrase in phrases
+                if filter_for_english_dictionary_words(phrase) != ""
+            ]
+            for word, phrases in word_alignments.items()
+            if filter_for_tibetan_dictionary_words(word) != ""
+        }
 
     # Process word alignments to get unique strings with frequencies and order them
     filtered_word_alignments = {}
