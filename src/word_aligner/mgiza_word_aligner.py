@@ -223,8 +223,9 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
                     indices = [int(idx) for idx in align.split("{")[1].split()]
 
                     grouped_indices = group_consecutive_indices(indices)
+                    # join words formed by word alignment with '*' sign
                     grouped_source_words = [
-                        "-".join(source_tokens[idx - 1] for idx in group)
+                        "*".join(source_tokens[idx - 1] for idx in group)
                         for group in grouped_indices
                     ]
 
