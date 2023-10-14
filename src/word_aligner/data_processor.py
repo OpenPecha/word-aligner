@@ -3,6 +3,8 @@ from typing import List
 
 from botok import TSEK
 
+from word_aligner.config import CLOSING_PUNCTS_CHAR_SET
+
 
 def remove_number_emojis(text: str) -> str:
     # 1️⃣, 2️⃣, 3️⃣ annotations were used for machine translation evaluation
@@ -27,6 +29,16 @@ def keep_neccessary_english_characters_for_dictionary(text: str) -> str:
     text = re.sub(r"[*|+]{1}[^a-zA-Z0-9\-\$\*\+]+[*|+]{1}", r"*", text)
     # if non neccessary ascii characters was in beginning or end
     text = re.sub(r"[*|+]{0,1}[^a-zA-Z0-9\-\$\*\+]+[*|+]{0,1}", r"", text)
+    return text
+
+
+def keep_neccessary_tibetan_characters_for_dictionary(text: str) -> str:
+    # if closing_puncts was in between
+    pattern = r"[*|+]{1}" + CLOSING_PUNCTS_CHAR_SET + "+[*|+]{1}"
+    text = re.sub(pattern, r"*", text)
+    # if closing_puncts was in beginning or end
+    pattern = r"[*|+]{0,1}" + CLOSING_PUNCTS_CHAR_SET + "+[*|+]{0,1}"
+    text = re.sub(pattern, r"", text)
     return text
 
 
