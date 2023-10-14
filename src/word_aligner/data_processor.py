@@ -45,7 +45,6 @@ def clean_english_text(text: str) -> str:
 
 def clean_text(text: str) -> str:
     text = remove_number_emojis(text)
-    text = normalise_punctuation(text)
     return text
 
 
@@ -60,5 +59,5 @@ if __name__ == "__main__":
 
     # Example usage:
     input_text = "This is a བཀྲ་ཤིས་sample བདེ་ལེགས་ text."
-    filtered_text = clean_tibetan_text(input_text)
+    filtered_text = clean_english_text(input_text)
     print(filtered_text)
