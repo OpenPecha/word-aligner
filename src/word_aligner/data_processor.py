@@ -26,9 +26,9 @@ def keep_neccessary_english_characters(text: str) -> str:
 
 def filter_for_english_dictionary_words(text: str) -> str:
     # if non neccessary ascii characters was in between
-    text = re.sub(r"[*|+]{1}[^a-zA-Z0-9\-\$\*\+]+[*|+]{1}", r"*", text)
+    text = re.sub(r"[*|+]{1}[^a-zA-Z0-9\-\$\*\+\']+[*|+]{1}", r"*", text)
     # if non neccessary ascii characters was in beginning or end
-    text = re.sub(r"[*|+]{0,1}[^a-zA-Z0-9\-\$\*\+]+[*|+]{0,1}", r"", text)
+    text = re.sub(r"[*|+]{0,1}[^a-zA-Z0-9\-\$\*\+\']+[*|+]{0,1}", r"", text)
     return text
 
 
