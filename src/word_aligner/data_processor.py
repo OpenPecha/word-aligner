@@ -13,15 +13,13 @@ def keep_only_tibetan_characters(text: str) -> str:
     return re.sub(r"[^\u0F00-\u0FFF\s\n\t]+", r"", text)
 
 
-def keep_only_english_characters(text: str) -> str:
+def keep_only_ascii_characters(text: str) -> str:
     # keep only ascii characters
     return re.sub(r"[^\x00-\x7F]", r"", text)
 
 
-def normalise_punctuation(text: str) -> str:
-    text = re.sub(r"[\{\(\[]", " < ", text)
-    text = re.sub(r"[\}\)\]]", " > ", text)
-    return text
+def keep_only_neccessary_english_characters(text: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9\s\n\t\.\,\?\!\'\$\&\+\%]+", r"", text)
 
 
 def normalise_tsek(text: str) -> str:
@@ -29,16 +27,17 @@ def normalise_tsek(text: str) -> str:
 
 
 def clean_tibetan_text(text: str) -> str:
-    text = keep_only_tibetan_characters(text)
     text = clean_text(text)
+    text = keep_only_tibetan_characters(text)
     text = normalise_tsek(text)
     text = re.sub(r"[ ]+", "", text).strip()
     return text
 
 
 def clean_english_text(text: str) -> str:
-    text = keep_only_english_characters(text)
     text = clean_text(text)
+    text = keep_only_ascii_characters(text)
+    text = keep_only_neccessary_english_characters(text)
     text = re.sub(r"[ ]+", " ", text).strip()
     return text
 
