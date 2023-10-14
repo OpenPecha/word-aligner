@@ -5,6 +5,8 @@ import subprocess
 from collections import Counter
 from typing import Dict
 
+from botok import TSEK
+
 from word_aligner.data_processor import (
     clean_english_text,
     clean_tibetan_text,
@@ -255,6 +257,7 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
             for word, phrases in word_alignments.items()
             if filter_for_english_dictionary_words(word) != ""
         }
+
     else:
         word_alignments = {
             filter_for_tibetan_dictionary_words(word): [
@@ -265,6 +268,26 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
             for word, phrases in word_alignments.items()
             if filter_for_tibetan_dictionary_words(word) != ""
         }
+        # Add tsek to the end of tibetan words
+        keys_to_remove = []
+        newly_added_word_alignment = {}
+        for tibetan_word in word_alignments.keys():
+            if not tibetan_word.endswith(TSEK):
+                keys_to_remove.append(tibetan_word)
+                tibetan_word_with_tsek = tibetan_word + TSEK
+                if tibetan_word_with_tsek in word_alignments:
+                    word_alignments[tibetan_word_with_tsek].extend(
+                        word_alignments[tibetan_word]
+                    )
+
+                else:
+                    newly_added_word_alignment[
+                        tibetan_word_with_tsek
+                    ] = word_alignments[tibetan_word]
+        # Remove the old keys
+        for key in keys_to_remove:
+            del word_alignments[key]
+        word_alignments.update(newly_added_word_alignment)
 
     # Process word alignments to get unique strings with frequencies and order them
     filtered_word_alignments = {}

@@ -38,7 +38,7 @@ def filter_for_tibetan_dictionary_words(text: str) -> str:
     text = re.sub(pattern, r"*", text)
     # if closing_puncts was in beginning or end
     pattern = r"[*|+]{0,1}" + CLOSING_PUNCTS_CHAR_SET + "+[*|+]{0,1}"
-    text = re.sub(pattern, r"", text)
+    text = re.sub(pattern, r"", text).strip()
     return text
 
 
