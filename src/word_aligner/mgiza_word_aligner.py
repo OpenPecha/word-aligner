@@ -257,6 +257,13 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
             for word, phrases in word_alignments.items()
             if filter_for_english_dictionary_words(word) != ""
         }
+        # Add tsek to the end of tibetan words for key
+        word_alignments = {
+            word: [
+                phrase if phrase.endswith(TSEK) else phrase + TSEK for phrase in phrases
+            ]
+            for word, phrases in word_alignments.items()
+        }
 
     else:
         word_alignments = {
@@ -268,7 +275,7 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
             for word, phrases in word_alignments.items()
             if filter_for_tibetan_dictionary_words(word) != ""
         }
-        # Add tsek to the end of tibetan words
+        # Add tsek to the end of tibetan words for key
         keys_to_remove = []
         newly_added_word_alignment = {}
         for tibetan_word in word_alignments.keys():
