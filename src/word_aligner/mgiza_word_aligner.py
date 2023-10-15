@@ -298,6 +298,7 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
     # Process word alignments to get unique strings with frequencies and order them
     filtered_word_alignments = {}
+    filtered_word_alignments_without_count = {}
     for target_word, source_phrases in word_alignments.items():
         counter = Counter(source_phrases)
 
@@ -316,6 +317,9 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
         filtered_word_alignments[target_word] = [
             f"{phrase}_{count}" for phrase, count in ordered_phrases
         ]
+        filtered_word_alignments_without_count[target_word] = [
+            phrase for phrase, _ in ordered_phrases
+        ]
 
     # Write results to output file
     print("Writing to aligned_words.txt...")
@@ -326,6 +330,8 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
     print("Writing complete.")
     print(f"Word alignments saved to {out_file}")
+
+    return filtered_word_alignments_without_count
 
 
 if __name__ == "__main__":
