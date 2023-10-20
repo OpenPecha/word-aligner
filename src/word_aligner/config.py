@@ -31,4 +31,5 @@ OPENING_PUNCTS = [
     "࿙",
 ]
 CLOSING_PUNCTS = ["།", "༎", "༏", "༐", "༔", "༴", "༻", "༽", "༾", "࿚"]
+CLOSING_PUNCTS_CHAR_SET = "[།༎༏༐༔༴༻༽༾࿚]"
 PUNCTS = OPENING_PUNCTS + CLOSING_PUNCTS

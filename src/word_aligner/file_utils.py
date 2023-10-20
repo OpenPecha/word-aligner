@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import List
 
-from word_aligner.config import RESOURCE_FOLDER_DIR, TMs_30, TMs_4006
+from word_aligner.config import DATA_FOLDER_DIR, RESOURCE_FOLDER_DIR
 
 BO_EN_FILE_PATH = Path(RESOURCE_FOLDER_DIR / "bo_en_list.txt")
 
@@ -81,5 +81,22 @@ def copy_bo_en_file_pairs(source_folder: Path, destination_folder: Path, count: 
         counter += 2
 
 
+def filter_unique_characters_in_file(file_path):
+    with open(file_path) as file:
+        content = file.read()
+    from word_aligner.data_processor import keep_only_english_characters
+
+    content = keep_only_english_characters(content)
+    # Use a set to store unique characters
+    unique_characters = set(content)
+
+    # Convert the set of unique characters back to a string
+    # unique_characters_str = ''.join(unique_characters)
+
+    return unique_characters
+
+
 if __name__ == "__main__":
-    copy_bo_en_file_pairs(TMs_4006, TMs_30, 30)
+    file_path = DATA_FOLDER_DIR / "en_merged.txt"
+    unique_characters_str = filter_unique_characters_in_file(file_path)
+    print(unique_characters_str)

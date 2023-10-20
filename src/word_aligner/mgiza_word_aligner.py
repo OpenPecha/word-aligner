@@ -5,7 +5,14 @@ import subprocess
 from collections import Counter
 from typing import Dict
 
-from word_aligner.data_processor import clean_english_text, clean_tibetan_text
+from botok import TSEK
+
+from word_aligner.data_processor import (
+    clean_english_text,
+    clean_tibetan_text,
+    filter_for_english_dictionary_words,
+    filter_for_tibetan_dictionary_words,
+)
 from word_aligner.tibetan_words_combiner import (
     load_tibetan_word_dictionary,
     merge_tibetan_compound_words,
@@ -223,8 +230,9 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
                     indices = [int(idx) for idx in align.split("{")[1].split()]
 
                     grouped_indices = group_consecutive_indices(indices)
+                    # join words formed by word alignment with '*' sign
                     grouped_source_words = [
-                        "-".join(source_tokens[idx - 1] for idx in group)
+                        "*".join(source_tokens[idx - 1] for idx in group)
                         for group in grouped_indices
                     ]
 
@@ -237,8 +245,60 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
             f"Number of alignments captured after processing {alignment_file}: {len(word_alignments)}"
         )
 
+    # Cleaning the words before writing to file
+
+    if is_source_file_english:
+        word_alignments = {
+            filter_for_english_dictionary_words(word): [
+                filter_for_tibetan_dictionary_words(phrase)
+                for phrase in phrases
+                if filter_for_tibetan_dictionary_words(phrase) != ""
+            ]
+            for word, phrases in word_alignments.items()
+            if filter_for_english_dictionary_words(word) != ""
+        }
+        # Add tsek to the end of tibetan words for key
+        word_alignments = {
+            word: [
+                phrase if phrase.endswith(TSEK) else phrase + TSEK for phrase in phrases
+            ]
+            for word, phrases in word_alignments.items()
+        }
+
+    else:
+        word_alignments = {
+            filter_for_tibetan_dictionary_words(word): [
+                filter_for_english_dictionary_words(phrase)
+                for phrase in phrases
+                if filter_for_english_dictionary_words(phrase) != ""
+            ]
+            for word, phrases in word_alignments.items()
+            if filter_for_tibetan_dictionary_words(word) != ""
+        }
+        # Add tsek to the end of tibetan words for key
+        keys_to_remove = []
+        newly_added_word_alignment = {}
+        for tibetan_word in word_alignments.keys():
+            if not tibetan_word.endswith(TSEK):
+                keys_to_remove.append(tibetan_word)
+                tibetan_word_with_tsek = tibetan_word + TSEK
+                if tibetan_word_with_tsek in word_alignments:
+                    word_alignments[tibetan_word_with_tsek].extend(
+                        word_alignments[tibetan_word]
+                    )
+
+                else:
+                    newly_added_word_alignment[
+                        tibetan_word_with_tsek
+                    ] = word_alignments[tibetan_word]
+        # Remove the old keys
+        for key in keys_to_remove:
+            del word_alignments[key]
+        word_alignments.update(newly_added_word_alignment)
+
     # Process word alignments to get unique strings with frequencies and order them
     filtered_word_alignments = {}
+    filtered_word_alignments_without_count = {}
     for target_word, source_phrases in word_alignments.items():
         counter = Counter(source_phrases)
 
@@ -257,6 +317,9 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
         filtered_word_alignments[target_word] = [
             f"{phrase}_{count}" for phrase, count in ordered_phrases
         ]
+        filtered_word_alignments_without_count[target_word] = [
+            phrase for phrase, _ in ordered_phrases
+        ]
 
     # Write results to output file
     print("Writing to aligned_words.txt...")
@@ -267,6 +330,8 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
     print("Writing complete.")
     print(f"Word alignments saved to {out_file}")
+
+    return filtered_word_alignments_without_count
 
 
 if __name__ == "__main__":
