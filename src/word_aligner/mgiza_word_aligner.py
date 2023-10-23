@@ -118,6 +118,8 @@ def tokenize_and_merge_files(
                             bo_content, bo_tokenized
                         )
                         if eng_tokenized and bo_tokenized:
+                            if eng_tokenized.count("\n") != bo_tokenized.count("\n"):
+                                continue
                             english_out.write(eng_tokenized + "\n")
                             tibetan_out.write(bo_tokenized + "\n")
                             if files_counter >= num_files_to_train:
