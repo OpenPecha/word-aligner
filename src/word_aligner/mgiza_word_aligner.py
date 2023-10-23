@@ -1,4 +1,5 @@
 import glob
+import json
 import os
 import string
 import subprocess
@@ -7,6 +8,7 @@ from typing import Dict
 
 from botok import TSEK
 
+from word_aligner.annotation_transfer import newline_annotations_transfer
 from word_aligner.data_processor import (
     clean_english_text,
     clean_tibetan_text,
@@ -35,7 +37,8 @@ def tokenize_and_merge_files(
     num_files_to_train=1,
 ):
     # Paths
-    data_dir = "data"
+    base_dir = os.getcwd()
+    data_dir = os.path.join(base_dir, "data")
     input_dir = os.path.join(data_dir, "input")
     english_out_file = os.path.join(data_dir, "english.txt")
     tibetan_out_file = os.path.join(data_dir, "tibetan.txt")
@@ -56,8 +59,8 @@ def tokenize_and_merge_files(
                 english_files = [f for f in files_in_subdir if f.endswith("-en.txt")]
                 tibetan_files = [f for f in files_in_subdir if f.endswith("-bo.txt")]
 
-                english_files = sorted(english_files)[:num_files_to_train]
-                tibetan_files = sorted(tibetan_files)[:num_files_to_train]
+                english_files = sorted(english_files)
+                tibetan_files = sorted(tibetan_files)
 
                 if len(english_files) != len(tibetan_files):
                     print(
@@ -65,6 +68,7 @@ def tokenize_and_merge_files(
                     )
                     continue
 
+                files_counter = 1
                 for english_file, tibetan_file in zip(
                     sorted(english_files), sorted(tibetan_files)
                 ):
@@ -73,37 +77,54 @@ def tokenize_and_merge_files(
                     ) as eng, open(
                         os.path.join(full_subdir_path, tibetan_file), encoding="utf-8"
                     ) as bo:
-                        en_lines = eng.readlines()
-                        bo_lines = bo.readlines()
+                        # if the len are same
 
-                        for en_line, bo_line in zip(en_lines, bo_lines):
-                            if combine_english_compound_words:
-                                en_line = tokenize_english_with_named_entities(
-                                    spacy_tokenizer_obj,
-                                    clean_english_text(en_line),
-                                    english_lemma,
-                                )
-                            else:
-                                en_line = tokenize_english_with_spacy(
-                                    spacy_tokenizer_obj,
-                                    clean_english_text(en_line),
-                                    english_lemma,
-                                )
-                            bo_line = tokenize_tibetan_with_botok(
-                                botok_tokenizer_obj,
-                                clean_tibetan_text(bo_line),
-                                split_affix,
-                                tibetan_lemma,
+                        eng_content = eng.read()
+                        bo_content = bo.read()
+                        if eng_content.count("\n") != bo_content.count("\n"):
+                            continue
+                        print(
+                            f"File: [{files_counter}/{num_files_to_train}] processing ..."
+                        )
+                        if combine_english_compound_words:
+                            eng_tokenized = tokenize_english_with_named_entities(
+                                spacy_tokenizer_obj,
+                                clean_english_text(eng_content),
+                                english_lemma,
                             )
-                            if combine_tibetan_compound_words:
-                                bo_line = merge_tibetan_compound_words(
-                                    TIBETAN_WORD_DICTIONARY, bo_line
-                                )
-
-                            if en_line and bo_line:
-                                english_out.write(en_line + "\n")
-                                tibetan_out.write(bo_line + "\n")
-
+                        else:
+                            eng_tokenized = tokenize_english_with_spacy(
+                                spacy_tokenizer_obj,
+                                clean_english_text(eng_content),
+                                english_lemma,
+                            )
+                        print("English tokenization done!..")
+                        bo_tokenized = tokenize_tibetan_with_botok(
+                            botok_tokenizer_obj,
+                            clean_tibetan_text(bo_content),
+                            split_affix,
+                            tibetan_lemma,
+                        )
+                        if combine_tibetan_compound_words:
+                            bo_tokenized = merge_tibetan_compound_words(
+                                TIBETAN_WORD_DICTIONARY, bo_tokenized
+                            )
+                        print("Tibetan tokenization done!..")
+                        # new line annotation transfer
+                        eng_tokenized = newline_annotations_transfer(
+                            eng_content, eng_tokenized
+                        )
+                        bo_tokenized = newline_annotations_transfer(
+                            bo_content, bo_tokenized
+                        )
+                        if eng_tokenized and bo_tokenized:
+                            if eng_tokenized.count("\n") != bo_tokenized.count("\n"):
+                                continue
+                            english_out.write(eng_tokenized + "\n")
+                            tibetan_out.write(bo_tokenized + "\n")
+                            if files_counter >= num_files_to_train:
+                                break
+                            files_counter += 1
     print(f"Data merged into {english_out_file} and {tibetan_out_file}.")
 
 
@@ -298,7 +319,7 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
     # Process word alignments to get unique strings with frequencies and order them
     filtered_word_alignments = {}
-    filtered_word_alignments_without_count = {}
+    filtered_word_alignments_json = {}
     for target_word, source_phrases in word_alignments.items():
         counter = Counter(source_phrases)
 
@@ -317,10 +338,34 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
         filtered_word_alignments[target_word] = [
             f"{phrase}_{count}" for phrase, count in ordered_phrases
         ]
-        filtered_word_alignments_without_count[target_word] = [
-            phrase for phrase, _ in ordered_phrases
+        filtered_word_alignments_json[target_word] = [
+            {
+                "translation": phrase.replace("*", " ").replace("+", " "),
+                "frequency": count,
+            }
+            for phrase, count in ordered_phrases
         ]
 
+    filtered_word_alignments_sorted_keys = sorted(
+        k.replace("+", " ") for k in filtered_word_alignments_json.keys()
+    )
+    filtered_word_alignments_json = {
+        new_key: filtered_word_alignments_json[old_key]
+        for new_key, old_key in zip(
+            filtered_word_alignments_sorted_keys,
+            sorted(filtered_word_alignments_json.keys()),
+        )
+    }
+    json_file_path = os.path.join(data_dir, "aligned_words.json")
+
+    # Writing the dictionary to a JSON file
+    with open(json_file_path, "w", encoding="utf-8") as json_file:
+        # The `indent` parameter is optional, used for pretty-printing
+        json.dump(
+            filtered_word_alignments_json, json_file, ensure_ascii=False, indent=4
+        )
+
+    print(f"Data has been written to {json_file_path}")
     # Write results to output file
     print("Writing to aligned_words.txt...")
     with open(out_file, "w", encoding="utf-8") as out:
@@ -330,8 +375,6 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
     print("Writing complete.")
     print(f"Word alignments saved to {out_file}")
-
-    return filtered_word_alignments_without_count
 
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
-from pathlib import Path
+# from pathlib import Path
 
-from word_aligner.alignment_accuracy_evaluator import (
-    count_word_matches,
-    read_json_to_dictionary,
-)
+# from word_aligner.alignment_accuracy_evaluator import (
+#     count_word_matches,
+#     read_json_to_dictionary,
+# )
 from word_aligner.mgiza_word_aligner import execute_mgiza, tokenize_and_merge_files
 
 
@@ -32,15 +32,15 @@ def pipeline(
         combine_english_compound_words=combine_english_compound_words,
         num_files_to_train=num_files_to_train,
     )
-    word_alignment_result = execute_mgiza(
+    execute_mgiza(
         threshold_frequency=threshold_frequency,
         is_source_file_english=is_source_file_english,
     )
-    RESOURCES_FOLDER_DIR = Path(__file__).parent / "resources"
-    json_file_path = RESOURCES_FOLDER_DIR / "tibetan_english_dict.json"
-    dict = read_json_to_dictionary(json_file_path)
-    matches = count_word_matches(word_alignment_result, dict)
-    print(f"Total matches with tibetan english dictionary: {matches}")
+    # RESOURCES_FOLDER_DIR = Path(__file__).parent / "resources"
+    # json_file_path = RESOURCES_FOLDER_DIR / "tibetan_english_dict.json"
+    # dict = read_json_to_dictionary(json_file_path)
+    # matches = count_word_matches(word_alignment_result, dict)
+    # print(f"Total matches with tibetan english dictionary: {matches}")
 
 
 if __name__ == "__main__":
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         tibetan_lemma=False,
         combine_tibetan_compound_words=True,
         english_lemma=True,
-        combine_english_compound_words=True,
+        combine_english_compound_words=False,
         num_files_to_train=1,
         threshold_frequency=3,
         is_source_file_english=False,
