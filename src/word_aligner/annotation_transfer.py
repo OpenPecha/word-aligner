@@ -6,6 +6,7 @@ def newline_annotations_transfer(source_text, target_text):
         ["new_line", r"(\n)"],
     ]
     target_text = remove_newlines(target_text)
+    target_text += " "
     annotated_text = transfer(source_text, annotations, target_text, output="txt")
     return annotated_text
 

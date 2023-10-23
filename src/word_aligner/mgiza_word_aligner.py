@@ -1,4 +1,5 @@
 import glob
+import json
 import os
 import string
 import subprocess
@@ -97,6 +98,7 @@ def tokenize_and_merge_files(
                                 clean_english_text(eng_content),
                                 english_lemma,
                             )
+                        print("English tokenization done!..")
                         bo_tokenized = tokenize_tibetan_with_botok(
                             botok_tokenizer_obj,
                             clean_tibetan_text(bo_content),
@@ -107,7 +109,8 @@ def tokenize_and_merge_files(
                             bo_tokenized = merge_tibetan_compound_words(
                                 TIBETAN_WORD_DICTIONARY, bo_tokenized
                             )
-                        print("Tokenization done!..")
+                        print("Tibetan tokenization done!..")
+                        # new line annotation transfer
                         eng_tokenized = newline_annotations_transfer(
                             eng_content, eng_tokenized
                         )
@@ -117,9 +120,9 @@ def tokenize_and_merge_files(
                         if eng_tokenized and bo_tokenized:
                             english_out.write(eng_tokenized + "\n")
                             tibetan_out.write(bo_tokenized + "\n")
-                            files_counter += 1
                             if files_counter >= num_files_to_train:
                                 break
+                            files_counter += 1
     print(f"Data merged into {english_out_file} and {tibetan_out_file}.")
 
 
@@ -314,7 +317,7 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
     # Process word alignments to get unique strings with frequencies and order them
     filtered_word_alignments = {}
-    filtered_word_alignments_without_count = {}
+    filtered_word_alignments_json = {}
     for target_word, source_phrases in word_alignments.items():
         counter = Counter(source_phrases)
 
@@ -333,10 +336,34 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
         filtered_word_alignments[target_word] = [
             f"{phrase}_{count}" for phrase, count in ordered_phrases
         ]
-        filtered_word_alignments_without_count[target_word] = [
-            phrase for phrase, _ in ordered_phrases
+        filtered_word_alignments_json[target_word] = [
+            {
+                "translation": phrase.replace("*", " ").replace("+", " "),
+                "frequency": count,
+            }
+            for phrase, count in ordered_phrases
         ]
 
+    filtered_word_alignments_sorted_keys = sorted(
+        k.replace("+", " ") for k in filtered_word_alignments_json.keys()
+    )
+    filtered_word_alignments_json = {
+        new_key: filtered_word_alignments_json[old_key]
+        for new_key, old_key in zip(
+            filtered_word_alignments_sorted_keys,
+            sorted(filtered_word_alignments_json.keys()),
+        )
+    }
+    json_file_path = os.path.join(data_dir, "aligned_words.json")
+
+    # Writing the dictionary to a JSON file
+    with open(json_file_path, "w", encoding="utf-8") as json_file:
+        # The `indent` parameter is optional, used for pretty-printing
+        json.dump(
+            filtered_word_alignments_json, json_file, ensure_ascii=False, indent=4
+        )
+
+    print(f"Data has been written to {json_file_path}")
     # Write results to output file
     print("Writing to aligned_words.txt...")
     with open(out_file, "w", encoding="utf-8") as out:
@@ -346,8 +373,6 @@ def execute_mgiza(threshold_frequency=1, is_source_file_english=True):
 
     print("Writing complete.")
     print(f"Word alignments saved to {out_file}")
-
-    return filtered_word_alignments_without_count
 
 
 if __name__ == "__main__":
