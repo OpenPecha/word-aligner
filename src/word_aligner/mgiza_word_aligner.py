@@ -80,9 +80,8 @@ def tokenize_and_merge_files(
                         if len(en_lines) != len(bo_lines):
                             continue
                         print(f"Tokenizing file [{file_count}/{num_files_to_train}]")
-                        if file_count >= num_files_to_train:
-                            break
-                        file_count += 1
+                        tokenized_english_lines = ""
+                        tokenized_tibetan_lines = ""
                         for en_line, bo_line in zip(en_lines, bo_lines):
                             if combine_english_compound_words:
                                 en_line = tokenize_english_with_named_entities(
@@ -108,8 +107,14 @@ def tokenize_and_merge_files(
                                 )
 
                             if en_line and bo_line:
-                                english_out.write(en_line + "\n")
-                                tibetan_out.write(bo_line + "\n")
+                                tokenized_english_lines += en_line + "\n"
+                                tokenized_tibetan_lines += bo_line + "\n"
+
+                        english_out.write(tokenized_english_lines)
+                        tibetan_out.write(tokenized_tibetan_lines)
+                        if file_count >= num_files_to_train:
+                            break
+                        file_count += 1
 
     print(f"Data merged into {english_out_file} and {tibetan_out_file}.")
 
