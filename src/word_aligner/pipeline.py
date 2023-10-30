@@ -50,7 +50,7 @@ if __name__ == "__main__":
         combine_tibetan_compound_words=True,
         english_lemma=True,
         combine_english_compound_words=False,
-        num_files_to_train=1,
+        num_files_to_train=3,
         threshold_frequency=3,
         is_source_file_english=False,
     )
